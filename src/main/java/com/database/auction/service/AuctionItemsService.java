@@ -3,12 +3,15 @@ package com.database.auction.service;
 
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
+import com.database.auction.entity.AuctionItems;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AuctionItemsService {
     List<AuctionItemDto> findAllAuctionItems();
     List<AuctionItemSummaryDto> findAllAuctionItemSummaries();
-    AuctionItemDto findAuctionItemById(Long id);
+    AuctionItemDto findAuctionItemByAuctionId(int auctionId);
+
     AuctionItemDto insertAuctionItem(AuctionItemDto auctionItemDto);
 }

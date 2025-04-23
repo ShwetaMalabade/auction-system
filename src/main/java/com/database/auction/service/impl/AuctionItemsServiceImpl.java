@@ -12,12 +12,16 @@ import com.database.auction.mapper.AuctionItemsMapper;
 import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.AuctionItemsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AuctionItemsServiceImpl implements AuctionItemsService {
 
@@ -45,6 +49,8 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     @Override
     public List<AuctionItemSummaryDto> findAllAuctionItemSummaries() {
         List<AuctionItems> items = auctionItemsRepository.findAll();
+        log.info(String.valueOf(items.stream()
+                    .map(auctionItemsMapper::toSummaryDto).toList()));
         return items.stream()
                 .map(auctionItemsMapper::toSummaryDto)
                 .collect(Collectors.toList());
@@ -79,9 +85,11 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     }
 
     @Override
-    public AuctionItemDto findAuctionItemById(Long id) {
-        AuctionItems auctionItem = auctionItemsRepository.findById(id)
-                .orElseThrow(() -> new AuctionItemNotFoundException("Auction item not found with id: " + id));
-        return auctionItemsMapper.toDto(auctionItem);
+    public AuctionItemDto findAuctionItemByAuctionId(int auction_id) {
+        AuctionItems item = auctionItemsRepository.findByAuctionIdNative(auction_id)
+                .orElseThrow(() -> new AuctionItemNotFoundException(
+                        "Auction item not found with auctionId=" + auction_id));
+        return auctionItemsMapper.toDto(item);
     }
+
 }

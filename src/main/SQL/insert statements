@@ -78,3 +78,62 @@ INSERT INTO Auction_Images (id, image_url, auction_item_id)
 VALUES (19, 'http://example.com/images/ram1.jpg', 10);
 INSERT INTO Auction_Images (id, image_url, auction_item_id) 
 VALUES (20, 'http://example.com/images/ram2.jpg', 10);
+
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(1, 'https://www.google.com/search?sca_esv=cc91aa7b516a412e&sxsrf=AHTn8zof3h7wANyV-OO8m6h-kjEXuWTqLQ:1745369907129&q=car+images&udm=2&fbs=ABzOT_CWdhQLP1FcmU5B0fn3xuWpA-dk4wpBWOGsoR7DG5zJBsxayPSIAqObp_AgjkUGqengxVrJ7hrmYmz7X2OZp_NIYfhIAjPnSJLO3GH6L0gKvuUU9jOm91_NGkSK1WJYVWjjHf1cMeOfIs5S2VkHB51zdvs5rEFgawK72NTjOMMeP0ZkzDJsLwBUA55RuQQ6_IgnTa_0Sg-ZSjc8BLe0lulqWQaGgA&sa=X&sqi=2&ved=2ahUKEwiXqsPK-eyMAxVBEFkFHdUZLkYQtKgLegQIDxAB&biw=1470&bih=736&dpr=2#vhid=UlbJDf0DD_9opM&vssid=mosaic', 1);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(2, 'https://www.google.com/search?sca_esv=cc91aa7b516a412e&sxsrf=AHTn8zof3h7wANyV-OO8m6h-kjEXuWTqLQ:1745369907129&q=car+images&udm=2&fbs=ABzOT_CWdhQLP1FcmU5B0fn3xuWpA-dk4wpBWOGsoR7DG5zJBsxayPSIAqObp_AgjkUGqengxVrJ7hrmYmz7X2OZp_NIYfhIAjPnSJLO3GH6L0gKvuUU9jOm91_NGkSK1WJYVWjjHf1cMeOfIs5S2VkHB51zdvs5rEFgawK72NTjOMMeP0ZkzDJsLwBUA55RuQQ6_IgnTa_0Sg-ZSjc8BLe0lulqWQaGgA&sa=X&sqi=2&ved=2ahUKEwiXqsPK-eyMAxVBEFkFHdUZLkYQtKgLegQIDxAB&biw=1470&bih=736&dpr=2#vhid=OxfijyVZ4zge-M&vssid=mosaic', 1);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(3, 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/2022_Honda_Civic_Sport_SE_Front.jpg/800px-2022_Honda_Civic_Sport_SE_Front.jpg', 2);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(4, 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/2022_Honda_Civic_Sport_SE_Rear.jpg/800px-2022_Honda_Civic_Sport_SE_Rear.jpg', 2);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(5, 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/%2718_Ford_F-150_XLT.jpg/800px-%2718_Ford_F-150_XLT.jpg', 3);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(6, 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/2018_Ford_F-150_XLT_front_%282%29_5.19.18.jpg/800px-2018_Ford_F-150_XLT_front_%282%29_5.19.18.jpg', 3);
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(7, 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/2019_Chevrolet_Silverado_1500_Crew_Cab_LT_%28front%29%2C_10.20.19.jpg/800px-2019_Chevrolet_Silverado_1500_Crew_Cab_LT_%28front%29%2C_10.20.19.jpg', 4);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(8, 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/2019_Chevrolet_Silverado_1500_Crew_Cab_LT_%28rear%29%2C_10.20.19.jpg/800px-2019_Chevrolet_Silverado_1500_Crew_Cab_LT_%28rear%29%2C_10.20.19.jpg', 4);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(9, 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Harley_-_Davidson.jpg/800px-Harley_-_Davidson.jpg', 5);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(10, 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Harley_%2830310592770%29.jpg/800px-Harley_%2830310592770%29.jpg', 5);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(11, 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Ducati_Monster_-_black.jpg/800px-Ducati_Monster_-_black.jpg', 6);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(12, 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Ducati_Monster_-_black.jpg/800px-Ducati_Monster_-_black.jpg', 6);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(13, 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/2018_BMW_3-Series_Sedan_%28SIAM_2018%29.jpg/800px-2018_BMW_3-Series_Sedan_%28SIAM_2018%29.jpg', 7);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(14, 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/BMW_3_SERIES_%28F30%29_TAIL_LAMP.jpg/800px-BMW_3_SERIES_%28F30%29_TAIL_LAMP.jpg', 7);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(15, 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Kawasaki_Ninja_1000SX_2020_SlantView.jpg/800px-Kawasaki_Ninja_1000SX_2020_SlantView.jpg', 8);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(16, 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Kawasaki_ninja1000%282012%29.JPG/800px-Kawasaki_ninja1000%282012%29.JPG', 8);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(17, 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/2023_Nissan_Altima_SR.png/800px-2023_Nissan_Altima_SR.png', 9);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(18, 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/2010_Nissan_Altima_2.5.jpg/778px-2010_Nissan_Altima_2.5.jpg', 9);
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(19, 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/%2719_Ram_1500_4x4_Crew_Cab.jpg/800px-%2719_Ram_1500_4x4_Crew_Cab.jpg', 10);
+
+INSERT INTO Auction_Images (id, image_url, auction_item_id) VALUES
+(20, 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/2019_Ram_1500_Bighorn%2C_rear_3.11.20.jpg/800px-2019_Ram_1500_Bighorn%2C_rear_3.11.20.jpg', 10);

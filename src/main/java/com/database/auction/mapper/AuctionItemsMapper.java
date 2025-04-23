@@ -5,11 +5,13 @@ import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class AuctionItemsMapper {
 
@@ -19,13 +21,13 @@ public class AuctionItemsMapper {
         }
         AuctionItemDto dto = new AuctionItemDto();
         dto.setId(auctionItem.getId());
-        dto.setAuctionId(auctionItem.getAuctionId());
-        dto.setSellerId(auctionItem.getSellerId());
-        dto.setItemName(auctionItem.getItemName());
+        dto.setAuctionId(auctionItem.getauction_id());
+        dto.setSellerId(auctionItem.getseller_id());
+        dto.setItemName(auctionItem.getitem_name());
         dto.setCategory(auctionItem.getCategory());
         dto.setStartingPrice(auctionItem.getStartingPrice());
-        dto.setBidIncrement(auctionItem.getBidIncrement());
-        dto.setReservePrice(auctionItem.getReservePrice());
+        dto.setBidIncrement(auctionItem.getbid_increment());
+        dto.setreserve_price(auctionItem.getreserve_price());
         dto.setClosingTime(auctionItem.getClosingTime());
         dto.setDescription(auctionItem.getDescription());
         List<String> imageUrls = auctionItem.getImages().stream()
@@ -40,13 +42,13 @@ public class AuctionItemsMapper {
             return null;
         }
         AuctionItems auctionItem = new AuctionItems();
-        auctionItem.setAuctionId(dto.getAuctionId());
-        auctionItem.setSellerId(dto.getSellerId());
-        auctionItem.setItemName(dto.getItemName());
+        auctionItem.setauction_id(dto.getAuctionId());
+        auctionItem.setseller_id(dto.getSellerId());
+        auctionItem.setitem_name(dto.getItemName());
         auctionItem.setCategory(dto.getCategory());
         auctionItem.setStartingPrice(dto.getStartingPrice());
-        auctionItem.setBidIncrement(dto.getBidIncrement());
-        auctionItem.setReservePrice(dto.getReservePrice());
+        auctionItem.setbid_increment(dto.getBidIncrement());
+        auctionItem.setreserve_price(dto.getreserve_price());
         auctionItem.setClosingTime(dto.getClosingTime());
         auctionItem.setDescription(dto.getDescription());
         // The images will be processed in the service if provided.
@@ -58,15 +60,19 @@ public class AuctionItemsMapper {
             return null;
         }
         AuctionItemSummaryDto summaryDto = new AuctionItemSummaryDto();
-        List<String> imageUrls = auctionItem.getImages().stream()
+        List<String> firstImageOnly = auctionItem.getImages().stream()
                 .map(AuctionImage::getImageUrl)
+                .limit(1)  // <-- stops after the first element
                 .collect(Collectors.toList());
-        summaryDto.setImages(imageUrls);
-        summaryDto.setItemName(auctionItem.getItemName());
+        summaryDto.setImages(firstImageOnly);
+        summaryDto.setItemName(auctionItem.getitem_name());
         // Pass the Category enum directly instead of converting it to string.
         summaryDto.setCategory(auctionItem.getCategory());
         summaryDto.setStartingPrice(auctionItem.getStartingPrice());
         summaryDto.setClosingTime(auctionItem.getClosingTime());
+        summaryDto.setAuctionId(auctionItem.getauction_id());
+        summaryDto.setDescription(auctionItem.getDescription());
+        log.info(summaryDto.toString());
         return summaryDto;
     }
 }

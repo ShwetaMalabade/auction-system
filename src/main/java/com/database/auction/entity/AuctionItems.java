@@ -15,30 +15,30 @@ public class AuctionItems {
     private Long id;
 
     @Column(name = "auction_id", unique = true)
-    private int auctionId;
+    private int auction_id;
 
     @Column(name = "seller_id")
-    private int sellerId;
+    private int seller_id;
 
     @Column(name = "item_name")
-    private String itemName;
+    private String item_name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
     private Category category;
 
     @Column(name = "starting_price")
-    private Double startingPrice;
+    private Double starting_price;
 
     @Column(name = "bid_increment")
-    private Double bidIncrement;
+    private Double bid_increment;
 
     @Column(name = "reserve_price")
-    private Double reservePrice;
+    private Double reserve_price;
 
     @Column(name = "closing_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date closingTime;
+    private Date closing_time;
 
     @Column(name = "description")
     private String description;
@@ -60,28 +60,28 @@ public class AuctionItems {
         this.id = id;
     }
 
-    public int getAuctionId() {
-        return auctionId;
+    public int getauction_id() {
+        return auction_id;
     }
 
-    public void setAuctionId(int auctionId) {
-        this.auctionId = auctionId;
+    public void setauction_id(int auction_id) {
+        this.auction_id = auction_id;
     }
 
-    public int getSellerId() {
-        return sellerId;
+    public int getseller_id() {
+        return seller_id;
     }
 
-    public void setSellerId(int sellerId) {
-        this.sellerId = sellerId;
+    public void setseller_id(int seller_id) {
+        this.seller_id = seller_id;
     }
 
-    public String getItemName() {
-        return itemName;
+    public String getitem_name() {
+        return item_name;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setitem_name(String item_name) {
+        this.item_name = item_name;
     }
 
 
@@ -94,35 +94,35 @@ public class AuctionItems {
     }
 
     public Double getStartingPrice() {
-        return startingPrice;
+        return starting_price;
     }
 
-    public void setStartingPrice(Double startingPrice) {
-        this.startingPrice = startingPrice;
+    public void setStartingPrice(Double starting_price) {
+        this.starting_price = starting_price;
     }
 
-    public Double getBidIncrement() {
-        return bidIncrement;
+    public Double getbid_increment() {
+        return bid_increment;
     }
 
-    public void setBidIncrement(Double bidIncrement) {
-        this.bidIncrement = bidIncrement;
+    public void setbid_increment(Double bid_increment) {
+        this.bid_increment = bid_increment;
     }
 
-    public Double getReservePrice() {
-        return reservePrice;
+    public Double getreserve_price() {
+        return reserve_price;
     }
 
-    public void setReservePrice(Double reservePrice) {
-        this.reservePrice = reservePrice;
+    public void setreserve_price(Double reserve_price) {
+        this.reserve_price = reserve_price;
     }
 
     public Date getClosingTime() {
-        return closingTime;
+        return closing_time;
     }
 
-    public void setClosingTime(Date closingTime) {
-        this.closingTime = closingTime;
+    public void setClosingTime(Date closing_time) {
+        this.closing_time = closing_time;
     }
 
     public String getDescription() {
@@ -139,5 +139,22 @@ public class AuctionItems {
 
     public void setImages(List<AuctionImage> images) {
         this.images = images;
+    }
+
+    @Override
+    public String toString() {
+        return "AuctionItems{" +
+                "id=" + id +
+                ", auction_id=" + auction_id +
+                ", seller_id=" + seller_id +
+                ", item_name='" + item_name + '\'' +
+                ", category=" + category +
+                ", startingPrice=" + starting_price +
+                ", bid_increment=" + bid_increment +
+                ", reserve_price=" + reserve_price +
+                ", closingTime=" + closing_time +
+                ", description='" + description + '\'' +
+                ", images=" + images +
+                '}';
     }
 }

@@ -7,13 +7,44 @@ import java.util.List;
 
 public class AuctionItemSummaryDto {
 
+    private int auction_id;
     private List<String> images;
-    private String itemName;
+    private String description;
+    private String item_name;
     private Category category;
-    private Double startingPrice;
-    private Date closingTime;
+    private Double starting_price;
+    private Date closing_time;
 
     public AuctionItemSummaryDto() {
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "AuctionItemSummaryDto{" +
+                "auction_id=" + auction_id +
+                ", images=" + images +
+                ", description='" + description + '\'' +
+                ", item_name='" + item_name + '\'' +
+                ", category=" + category +
+                ", starting_price=" + starting_price +
+                ", closing_time=" + closing_time +
+                '}';
+    }
+
+    public int getAuctionId() {
+        return auction_id;
+    }
+
+    public void setAuctionId(int auction_id) {
+        this.auction_id = auction_id;
     }
 
     public List<String> getImages() {
@@ -25,17 +56,17 @@ public class AuctionItemSummaryDto {
     }
 
     public String getItemName() {
-        return itemName;
+        return item_name;
     }
  
     public void setItemName(String itemName) {
-        this.itemName = itemName;
+        this.item_name = itemName;
     }
  
 
  
     public Double getStartingPrice() {
-        return startingPrice;
+        return starting_price;
     }
 
     public Category getCategory() {
@@ -47,14 +78,14 @@ public class AuctionItemSummaryDto {
     }
 
     public void setStartingPrice(Double startingPrice) {
-        this.startingPrice = startingPrice;
+        this.starting_price = startingPrice;
     }
  
     public Date getClosingTime() {
-        return closingTime;
+        return closing_time;
     }
  
     public void setClosingTime(Date closingTime) {
-        this.closingTime = closingTime;
+        this.closing_time = closingTime;
     }
 }

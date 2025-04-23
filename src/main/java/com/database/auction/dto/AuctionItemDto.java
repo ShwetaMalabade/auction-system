@@ -12,9 +12,9 @@ public class AuctionItemDto {
     private int sellerId;
     private String itemName;
     private Category category;
-    private Double startingPrice;
+    private Double starting_price;
     private Double bidIncrement;
-    private Double reservePrice;
+    private Double reserve_price;
     private Date closingTime;
     private String description;
     
@@ -67,11 +67,11 @@ public class AuctionItemDto {
     }
 
     public Double getStartingPrice() {
-        return startingPrice;
+        return starting_price;
     }
 
-    public void setStartingPrice(Double startingPrice) {
-        this.startingPrice = startingPrice;
+    public void setStartingPrice(Double starting_price) {
+        this.starting_price = starting_price;
     }
 
     public Double getBidIncrement() {
@@ -82,12 +82,12 @@ public class AuctionItemDto {
         this.bidIncrement = bidIncrement;
     }
 
-    public Double getReservePrice() {
-        return reservePrice;
+    public Double getreserve_price() {
+        return reserve_price;
     }
 
-    public void setReservePrice(Double reservePrice) {
-        this.reservePrice = reservePrice;
+    public void setreserve_price(Double reserve_price) {
+        this.reserve_price = reserve_price;
     }
 
     public Date getClosingTime() {
