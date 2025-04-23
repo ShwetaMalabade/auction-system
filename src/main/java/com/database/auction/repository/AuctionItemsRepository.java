@@ -3,11 +3,13 @@ package com.database.auction.repository;
 
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.entity.AuctionItems;
+import com.database.auction.enums.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +19,6 @@ public interface AuctionItemsRepository extends JpaRepository<AuctionItems, Long
             nativeQuery = true
     )
     Optional<AuctionItems> findByAuctionIdNative(@Param("auctionId") int auctionId);
+
+    List<AuctionItems> findAllByCategory(Category category);
 }

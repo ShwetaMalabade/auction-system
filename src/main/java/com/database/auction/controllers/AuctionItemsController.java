@@ -4,6 +4,7 @@ package com.database.auction.controllers;
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionItems;
+import com.database.auction.enums.Category;
 import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
 import com.database.auction.repository.AuctionItemsRepository;
@@ -42,6 +43,23 @@ public class AuctionItemsController {
     public ResponseEntity<List<AuctionItemSummaryDto>> getAuctionItemSummaries() {
         log.info("We have received the calling from frontend");
         return ResponseEntity.ok(auctionItemsService.findAllAuctionItemSummaries());
+    }
+
+    @GetMapping("/summary/{category}")
+    public ResponseEntity<List<AuctionItemSummaryDto>> getByCategory(
+            @PathVariable String category) {
+        Category cat;
+        try {
+            cat = Category.valueOf(category.toLowerCase());
+        } catch (IllegalArgumentException ex) {
+            // not one of CAR, BIKE, TRUCK
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+        List<AuctionItemSummaryDto> dtos =
+                auctionItemsService.findAuctionItemsByCategory(cat);
+        return ResponseEntity.ok(dtos);
     }
 
     // NEW: lookup by auctionId, return as ResponseEntity

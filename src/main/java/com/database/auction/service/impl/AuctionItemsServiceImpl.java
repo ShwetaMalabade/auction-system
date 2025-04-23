@@ -6,6 +6,7 @@ import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.entity.Users;
+import com.database.auction.enums.Category;
 import com.database.auction.enums.RoleType;
 import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
@@ -90,6 +91,14 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
                 .orElseThrow(() -> new AuctionItemNotFoundException(
                         "Auction item not found with auctionId=" + auction_id));
         return auctionItemsMapper.toDto(item);
+    }
+
+    @Override
+    public List<AuctionItemSummaryDto> findAuctionItemsByCategory(Category category) {
+        List<AuctionItems> items = auctionItemsRepository.findAllByCategory(category);
+        return items.stream()
+                .map(auctionItemsMapper::toSummaryDto)
+                .collect(Collectors.toList());
     }
 
 }
