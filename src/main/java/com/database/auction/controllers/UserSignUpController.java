@@ -50,4 +50,13 @@ public class UserSignUpController {
         return ResponseEntity.ok(profile);
     }
 
+    @PutMapping("/editprofile/{username}")
+    public ResponseEntity<ProfileDTO> editProfile(
+            @PathVariable String username,
+            @RequestBody ProfileDTO profileDto) {
+
+        ProfileDTO updated = usersService.updateProfile(username, profileDto);
+        return ResponseEntity.ok(updated);
+    }
+
 }

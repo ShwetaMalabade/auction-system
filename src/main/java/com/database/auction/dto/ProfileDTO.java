@@ -1,7 +1,10 @@
 package com.database.auction.dto;
 
 import com.database.auction.enums.RoleType;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ProfileDTO {
     private int    userId;
     private String username;
