@@ -6,23 +6,23 @@ import com.database.auction.entity.Users;
 public class UsersMapper {
 
     public static UsersDTO mapToUsersDto(Users users){
-        return new UsersDTO(
-                users.getUserId(),
-                users.getUsername(),
-                users.getPassword_hash(),
-                users.getEmail(),
-                users.getRole()
-        );
+        UsersDTO dto = new UsersDTO();
+        dto.setUser_id(users.getUserId());
+        dto.setUsername(users.getUsername());
+        dto.setPassword_hash(users.getPassword_hash());
+        dto.setEmail(users.getEmail());
+        dto.setRole(users.getRole());
+        return dto;
     }
 
     public static Users mapToUsers(UsersDTO usersDTO){
-        return new Users(
-                usersDTO.getUser_id(),
-                usersDTO.getUsername(),
-                usersDTO.getPassword_hash(),
-                usersDTO.getEmail(),
-                usersDTO.getRole()
-        );
+        Users u = new Users();
+        // **do not** set userId here—DB will generate it
+        u.setUsername(usersDTO.getUsername());
+        u.setPassword_hash(usersDTO.getPassword_hash());
+        u.setEmail(usersDTO.getEmail());
+        u.setRole(usersDTO.getRole());
+        return u;
     }
 
 
