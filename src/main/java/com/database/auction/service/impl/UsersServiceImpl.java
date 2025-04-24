@@ -1,20 +1,40 @@
 package com.database.auction.service.impl;
 
 import com.database.auction.dto.LoginDTO;
+import com.database.auction.dto.ProfileDTO;
 import com.database.auction.dto.UsersDTO;
+import com.database.auction.entity.UserDetails;
 import com.database.auction.entity.Users;
+import com.database.auction.enums.RoleType;
 import com.database.auction.exception.UserNotFound;
+import com.database.auction.mapper.ProfileMapper;
 import com.database.auction.mapper.UsersMapper;
+import com.database.auction.repository.UserDetailsRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.UsersService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
-@AllArgsConstructor
 public class UsersServiceImpl implements UsersService {
 
     private UsersRepository usersRepository;
+    private UserDetailsRepository userDetailsRepository;
+    private final JdbcTemplate jdbc;
+
+    @Autowired
+    public UsersServiceImpl(UsersRepository usersRepository,
+                            UserDetailsRepository userDetailsRepository,
+                            JdbcTemplate jdbc) {
+        this.usersRepository       = usersRepository;
+        this.userDetailsRepository = userDetailsRepository;
+        this.jdbc                  = jdbc;
+    }
 
     @Override
     public UsersDTO createUsers(UsersDTO usersDTO) {
@@ -34,14 +54,82 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public UsersDTO loginUser(LoginDTO loginDTO) {
-        System.out.println("Hiii");
         Users users = usersRepository.findByUsername(loginDTO.getUsername()).orElseThrow();
         System.out.println("Finding Username for "+loginDTO.getUsername()+" And "+loginDTO.getPassword_hash());
         if(users.getPassword_hash().equals(loginDTO.getPassword_hash())){
-            System.out.println("Yayy");
+            log.info("Username & Password is matching");
         } else{
             throw new UserNotFound("Password is not matching for "+loginDTO.getUsername());
         }
         return UsersMapper.mapToUsersDto(users);
     }
+
+    @Override
+    public ProfileDTO getProfileByUsername(String username) {
+        // JDBC-based fetching as before...
+        String sql = """
+            SELECT 
+              u.user_id         AS userId,
+              u.username        AS username,
+              u.password_hash   AS passwordHash,
+              u.email           AS email,
+              u.role            AS role,
+              d.first_name      AS firstName,
+              d.last_name       AS lastName,
+              d.address         AS address,
+              d.phone_number    AS phoneNumber
+            FROM Users u
+            LEFT JOIN user_details d ON u.username = d.username
+            WHERE u.username = ?
+            """;
+
+        return jdbc.queryForObject(
+                sql,
+                new Object[]{ username },
+                (rs, rowNum) -> {
+                    ProfileDTO p = new ProfileDTO();
+                    p.setUserId      (rs.getInt    ("userId"));
+                    p.setUsername    (rs.getString ("username"));
+                    //p.setPasswordHash(rs.getString ("passwordHash"));
+                    p.setEmail       (rs.getString ("email"));
+                    p.setRole        (RoleType.valueOf(rs.getString("role")));
+                    p.setFirstName   (rs.getString ("firstName"));
+                    p.setLastName    (rs.getString ("lastName"));
+                    p.setAddress     (rs.getString ("address"));
+                    p.setPhoneNumber (rs.getString ("phoneNumber"));
+                    return p;
+                }
+        );
+    }
+
+    @Override
+    public ProfileDTO updateProfile(String username, ProfileDTO dto) {
+        // 1) ensure user exists
+        Users user = usersRepository.findByUsername(username).orElseThrow();
+        if (user == null) {
+            throw new EntityNotFoundException("User not found: " + username);
+        }
+
+        // 2) update or insert details
+        int updated = userDetailsRepository.updateDetails(
+                username,
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getAddress(),
+                dto.getPhoneNumber()
+        );
+        if (updated == 0) {
+            userDetailsRepository.insertDetails(
+                    username,
+                    dto.getFirstName(),
+                    dto.getLastName(),
+                    dto.getAddress(),
+                    dto.getPhoneNumber()
+            );
+        }
+
+        // 3) fetch back updated profile via JDBC
+        return getProfileByUsername(username);
+    }
+
 }
