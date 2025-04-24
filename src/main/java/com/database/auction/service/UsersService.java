@@ -2,6 +2,7 @@ package com.database.auction.service;
 
 
 import com.database.auction.dto.LoginDTO;
+import com.database.auction.dto.ProfileDTO;
 import com.database.auction.dto.UsersDTO;
 
 public interface UsersService {
@@ -10,6 +11,7 @@ public interface UsersService {
     UsersDTO getUsers(Integer user_id);
 
     UsersDTO loginUser(LoginDTO loginDTO);
+    ProfileDTO getProfileByUsername(String username);
 
     //UsersDTO loginUsers()
 }
