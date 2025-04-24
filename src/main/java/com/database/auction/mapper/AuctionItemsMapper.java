@@ -30,6 +30,7 @@ public class AuctionItemsMapper {
         dto.setreserve_price(auctionItem.getreserve_price());
         dto.setClosingTime(auctionItem.getClosingTime());
         dto.setDescription(auctionItem.getDescription());
+        dto.setCurrentBid(auctionItem.getCurrentBid());
         List<String> imageUrls = auctionItem.getImages().stream()
                 .map(AuctionImage::getImageUrl)
                 .collect(Collectors.toList());
@@ -51,6 +52,7 @@ public class AuctionItemsMapper {
         auctionItem.setreserve_price(dto.getreserve_price());
         auctionItem.setClosingTime(dto.getClosingTime());
         auctionItem.setDescription(dto.getDescription());
+        auctionItem.setCurrentBid(dto.getCurrentBid());
         // The images will be processed in the service if provided.
         return auctionItem;
     }
@@ -68,7 +70,8 @@ public class AuctionItemsMapper {
         summaryDto.setItemName(auctionItem.getitem_name());
         // Pass the Category enum directly instead of converting it to string.
         summaryDto.setCategory(auctionItem.getCategory());
-        summaryDto.setStartingPrice(auctionItem.getStartingPrice());
+        //summaryDto.setStartingPrice(auctionItem.getStartingPrice());
+        summaryDto.setCurrentBid(auctionItem.getCurrentBid());
         summaryDto.setClosingTime(auctionItem.getClosingTime());
         summaryDto.setAuctionId(auctionItem.getauction_id());
         summaryDto.setDescription(auctionItem.getDescription());

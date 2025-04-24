@@ -43,6 +43,9 @@ public class AuctionItems {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "current_bid")
+    private Double currentBid;
+
     // One auction item can have many images.
     @OneToMany(mappedBy = "auctionItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AuctionImage> images = new ArrayList<>();
@@ -54,6 +57,14 @@ public class AuctionItems {
 
     public Long getId() {
         return id;
+    }
+
+    public Double getCurrentBid() {
+        return currentBid;
+    }
+
+    public void setCurrentBid(Double currentBid) {
+        this.currentBid = currentBid;
     }
 
     public void setId(Long id) {

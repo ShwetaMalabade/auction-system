@@ -12,8 +12,9 @@ public class AuctionItemSummaryDto {
     private String description;
     private String item_name;
     private Category category;
-    private Double starting_price;
+   // private Double starting_price;
     private Date closing_time;
+    private Double currentBid;
 
     public AuctionItemSummaryDto() {
     }
@@ -34,9 +35,16 @@ public class AuctionItemSummaryDto {
                 ", description='" + description + '\'' +
                 ", item_name='" + item_name + '\'' +
                 ", category=" + category +
-                ", starting_price=" + starting_price +
+                ", starting_price=" + currentBid +
                 ", closing_time=" + closing_time +
                 '}';
+    }
+
+    public Double getCurrentBid() {
+        return currentBid;
+    }
+    public void setCurrentBid(Double currentBid) {
+        this.currentBid = currentBid;
     }
 
     public int getAuctionId() {
@@ -65,9 +73,9 @@ public class AuctionItemSummaryDto {
  
 
  
-    public Double getStartingPrice() {
-        return starting_price;
-    }
+//    public Double getStartingPrice() {
+//        return starting_price;
+//    }
 
     public Category getCategory() {
         return category;
@@ -77,9 +85,9 @@ public class AuctionItemSummaryDto {
         this.category = category;
     }
 
-    public void setStartingPrice(Double startingPrice) {
-        this.starting_price = startingPrice;
-    }
+//    public void setStartingPrice(Double startingPrice) {
+//        this.starting_price = startingPrice;
+//    }
  
     public Date getClosingTime() {
         return closing_time;

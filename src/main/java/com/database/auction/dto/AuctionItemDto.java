@@ -17,6 +17,7 @@ public class AuctionItemDto {
     private Double reserve_price;
     private Date closingTime;
     private String description;
+    private Double currentBid;
     
     // New field to hold image URLs
     private List<String> images;
@@ -28,6 +29,14 @@ public class AuctionItemDto {
 
     public Long getId() {
         return id;
+    }
+
+    public Double getCurrentBid() {
+        return currentBid;
+    }
+
+    public void setCurrentBid(Double currentBid) {
+        this.currentBid = currentBid;
     }
 
     public void setId(Long id) {

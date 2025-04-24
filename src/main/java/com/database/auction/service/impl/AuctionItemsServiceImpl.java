@@ -80,6 +80,13 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             auctionItem.setImages(images);
         }
 
+        // initialize currentBid
+        if (auctionItemDto.getCurrentBid() != null) {
+            auctionItem.setCurrentBid(auctionItemDto.getCurrentBid());
+        } else {
+            auctionItem.setCurrentBid(auctionItem.getStartingPrice());
+        }
+
         // Persist the auction item in the database
         AuctionItems savedItem = auctionItemsRepository.save(auctionItem);
         return auctionItemsMapper.toDto(savedItem);
