@@ -43,20 +43,26 @@ public class UserSignUpController {
         return new ResponseEntity<>(usersService.loginUser(loginDTO), HttpStatus.OK);
     }
 
-    @GetMapping("/profile/{username}")
-    public ResponseEntity<ProfileDTO> getProfile(@PathVariable String username) {
-        log.info("User Profile info for "+username);
-        ProfileDTO profile = usersService.getProfileByUsername(username);
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<ProfileDTO> getProfile(
+            @PathVariable int userId) {
+
+        ProfileDTO profile = usersService.getProfileByUserId(userId);
         return ResponseEntity.ok(profile);
     }
 
-    @PutMapping("/editprofile/{username}")
+    /**
+     * PUT /auth/editprofile/{userId}
+     */
+    @PutMapping("/editprofile/{userId}")
     public ResponseEntity<ProfileDTO> editProfile(
-            @PathVariable String username,
+            @PathVariable int userId,
             @RequestBody ProfileDTO profileDto) {
 
-        ProfileDTO updated = usersService.updateProfile(username, profileDto);
+        ProfileDTO updated = usersService.updateProfileByUserId(userId, profileDto);
         return ResponseEntity.ok(updated);
     }
+
+
 
 }
