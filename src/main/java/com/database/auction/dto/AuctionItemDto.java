@@ -5,6 +5,7 @@ import com.database.auction.enums.Category;
 import java.util.Date;
 import java.util.List;
 
+
 public class AuctionItemDto {
 
     private Long id;
