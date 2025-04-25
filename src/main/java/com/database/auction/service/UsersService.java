@@ -14,5 +14,8 @@ public interface UsersService {
     ProfileDTO getProfileByUsername(String username);
     ProfileDTO updateProfile(String username, ProfileDTO profileDto);
 
+    ProfileDTO getProfileByUserId(int userId);
+    ProfileDTO updateProfileByUserId(int userId, ProfileDTO profileDto);
+
     //UsersDTO loginUsers()
 }

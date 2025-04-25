@@ -132,4 +132,23 @@ public class UsersServiceImpl implements UsersService {
         return getProfileByUsername(username);
     }
 
+    @Override
+    public ProfileDTO getProfileByUserId(int userId) {
+        // fetch the username for this userId
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+        // reuse your JDBC-based loader
+        return getProfileByUsername(user.getUsername());
+    }
+
+    @Override
+    public ProfileDTO updateProfileByUserId(int userId, ProfileDTO dto) {
+        // fetch the username for this userId
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+
+        // delegate to your existing username-based updater
+        return updateProfile(user.getUsername(), dto);
+    }
+
 }
