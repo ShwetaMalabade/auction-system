@@ -27,7 +27,7 @@ public class AuctionItemsMapper {
         dto.setCategory(auctionItem.getCategory());
         dto.setStartingPrice(auctionItem.getStartingPrice());
         dto.setBidIncrement(auctionItem.getbid_increment());
-        dto.setreserve_price(auctionItem.getreserve_price());
+        //dto.setreserve_price(auctionItem.getreserve_price());
         dto.setClosingTime(auctionItem.getClosingTime());
         dto.setDescription(auctionItem.getDescription());
         dto.setCurrentBid(auctionItem.getCurrentBid());
@@ -49,7 +49,7 @@ public class AuctionItemsMapper {
         auctionItem.setCategory(dto.getCategory());
         auctionItem.setStartingPrice(dto.getStartingPrice());
         auctionItem.setbid_increment(dto.getBidIncrement());
-        auctionItem.setreserve_price(dto.getreserve_price());
+        //auctionItem.setreserve_price(dto.getreserve_price());
         auctionItem.setClosingTime(dto.getClosingTime());
         auctionItem.setDescription(dto.getDescription());
         auctionItem.setCurrentBid(dto.getCurrentBid());
