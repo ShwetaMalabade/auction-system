@@ -33,8 +33,8 @@ public class AuctionItems {
     @Column(name = "bid_increment")
     private Double bid_increment;
 
-    @Column(name = "reserve_price")
-    private Double reserve_price;
+//    @Column(name = "reserve_price")
+//    private Double reserve_price;
 
     @Column(name = "closing_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -120,13 +120,13 @@ public class AuctionItems {
         this.bid_increment = bid_increment;
     }
 
-    public Double getreserve_price() {
-        return reserve_price;
-    }
-
-    public void setreserve_price(Double reserve_price) {
-        this.reserve_price = reserve_price;
-    }
+//    public Double getreserve_price() {
+//        return reserve_price;
+//    }
+//
+//    public void setreserve_price(Double reserve_price) {
+//        this.reserve_price = reserve_price;
+//    }
 
     public Date getClosingTime() {
         return closing_time;
@@ -162,7 +162,7 @@ public class AuctionItems {
                 ", category=" + category +
                 ", startingPrice=" + starting_price +
                 ", bid_increment=" + bid_increment +
-                ", reserve_price=" + reserve_price +
+                //", reserve_price=" + reserve_price +
                 ", closingTime=" + closing_time +
                 ", description='" + description + '\'' +
                 ", images=" + images +

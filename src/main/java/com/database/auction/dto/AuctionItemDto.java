@@ -5,6 +5,7 @@ import com.database.auction.enums.Category;
 import java.util.Date;
 import java.util.List;
 
+
 public class AuctionItemDto {
 
     private Long id;
@@ -14,7 +15,7 @@ public class AuctionItemDto {
     private Category category;
     private Double starting_price;
     private Double bidIncrement;
-    private Double reserve_price;
+//    private Double reserve_price;
     private Date closingTime;
     private String description;
     private Double currentBid;
@@ -91,13 +92,13 @@ public class AuctionItemDto {
         this.bidIncrement = bidIncrement;
     }
 
-    public Double getreserve_price() {
-        return reserve_price;
-    }
-
-    public void setreserve_price(Double reserve_price) {
-        this.reserve_price = reserve_price;
-    }
+//    public Double getreserve_price() {
+//        return reserve_price;
+//    }
+//
+//    public void setreserve_price(Double reserve_price) {
+//        this.reserve_price = reserve_price;
+//    }
 
     public Date getClosingTime() {
         return closingTime;

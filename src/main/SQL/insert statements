@@ -97,3 +97,6 @@ ALTER TABLE user_details
   MODIFY COLUMN last_name    VARCHAR(100),
   MODIFY COLUMN address      VARCHAR(255),
   MODIFY COLUMN phone_number VARCHAR(50);
+
+
+ALTER TABLE auction_items DROP COLUMN reserve_price;
