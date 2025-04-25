@@ -16,6 +16,7 @@ public interface UsersService {
 
     ProfileDTO getProfileByUserId(int userId);
     ProfileDTO updateProfileByUserId(int userId, ProfileDTO profileDto);
-
+    String pwd_Change(int userId,String password_hash);
     //UsersDTO loginUsers()
+
 }
