@@ -11,6 +11,7 @@ import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.repository.BidRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.BidService;
+import com.database.auction.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,42 +33,117 @@ public class BidServiceImpl implements BidService {
     private final UsersRepository usersRepo;
     private final BidMapper mapper;
     private final JdbcTemplate jdbc;
+    private final NotificationService notificationService;
 
     @Autowired
     public BidServiceImpl(BidRepository bidRepo,
                           AuctionItemsRepository itemsRepo,
                           UsersRepository usersRepo,
-                          BidMapper mapper,JdbcTemplate jdbc) {
+                          BidMapper mapper,JdbcTemplate jdbc,
+                          NotificationService notificationService) {
         this.bidRepo   = bidRepo;
         this.itemsRepo = itemsRepo;
         this.usersRepo = usersRepo;
         this.mapper    = mapper;
         this.jdbc   = jdbc;
+        this.notificationService = notificationService;
+
     }
+
+//    @Override
+//    public BidDto placeBid(BidDto dto) {
+//        log.info("Placing a bid for "+dto.getBuyerId());
+//        // 1️⃣ load by business key, not PK
+//        AuctionItems item = itemsRepo
+//                .findByAuctionIdNative(dto.getAuctionId())
+//                .orElseThrow(() -> new AuctionItemNotFoundException(
+//                        "Auction not found: " + dto.getAuctionId()));
+//
+//        Users buyer = usersRepo.findById(dto.getBuyerId())
+//                .orElseThrow(() -> new UserNotFound(
+//                        "Buyer not found: " + dto.getBuyerId()));
+//
+//        if (dto.getBidTime() == null) {
+//            dto.setBidTime(new Date());
+//        }
+//
+//        Bid bid = mapper.toEntity(dto, item, buyer);
+//        Bid saved = bidRepo.save(bid);
+//
+//        updateCurrentBid(item);
+//
+//        return mapper.toDto(saved);
+//    }
 
     @Override
     public BidDto placeBid(BidDto dto) {
-        log.info("Placing a bid for "+dto.getBuyerId());
-        // 1️⃣ load by business key, not PK
+        log.info("Placing bid by buyer {} on auction {}", dto.getBuyerId(), dto.getAuctionId());
+
+        // 1) Load auction and buyer (existing code)
         AuctionItems item = itemsRepo
                 .findByAuctionIdNative(dto.getAuctionId())
                 .orElseThrow(() -> new AuctionItemNotFoundException(
                         "Auction not found: " + dto.getAuctionId()));
-
         Users buyer = usersRepo.findById(dto.getBuyerId())
                 .orElseThrow(() -> new UserNotFound(
                         "Buyer not found: " + dto.getBuyerId()));
 
-        if (dto.getBidTime() == null) {
-            dto.setBidTime(new Date());
+        if (dto.getBidTime() == null) dto.setBidTime(new Date());
+
+        // 2) Capture previous top (if any)
+        Optional<Bid> previousTop = bidRepo
+                .findAllByAuctionItem_Id(item.getId())
+                .stream()
+                .max(Comparator.comparing(Bid::getReservePrice));
+
+        // 3) Save the new bid
+        Bid newBid   = mapper.toEntity(dto, item, buyer);
+        Bid savedBid = bidRepo.save(newBid);
+
+        // 4) Recompute currentBid
+        List<Bid> allBids = bidRepo.findAllByAuctionItem_Id(item.getId());
+        allBids.sort(Comparator.comparing(Bid::getReservePrice).reversed());
+
+        Bid highestBid       = allBids.get(0);
+        double secondReserve = allBids.size() > 1
+                ? allBids.get(1).getReservePrice()
+                : highestBid.getReservePrice();
+
+        double newCurrentBid = secondReserve + item.getbid_increment();
+        item.setCurrentBid(newCurrentBid);
+        itemsRepo.save(item);
+
+        // 5a) If this new bid DID NOT become the top, notify *this* bidder
+        int newBidderId = savedBid.getBuyer().getUserId();
+        int currentWinnerId = highestBid.getBuyer().getUserId();
+        if (newBidderId != currentWinnerId) {
+            String msg = String.format(
+                    "Your bid on auction %d was not high enough. Current top bid: £%.2f",
+                    dto.getAuctionId(), newCurrentBid);
+            notificationService.alertOutbid(
+                    savedBid.getBuyer().getUserId(),
+                    dto.getAuctionId(),
+                    msg
+            );
+            log.info("Notified bidder {} that they were outbid", savedBid.getBuyer().getUserId());
         }
 
-        Bid bid = mapper.toEntity(dto, item, buyer);
-        Bid saved = bidRepo.save(bid);
+        // 5b) If there *was* a previous top, and they got beaten by someone else, notify them too
+        if (previousTop.isPresent()) {
+            Bid oldTop = previousTop.get();
+            int oldUserId = oldTop.getBuyer().getUserId();
+            int newTopId  = highestBid.getBuyer().getUserId();
+            if (oldUserId != newTopId) {
+                String msg = String.format(
+                        "You have been outbid on auction %d. New top bid: £%.2f",
+                        dto.getAuctionId(), newCurrentBid);
+                notificationService.alertOutbid(oldUserId, dto.getAuctionId(), msg);
+                log.info("Notified previous top bidder {} of being outbid", oldUserId);
+            }
+        }
 
-        updateCurrentBid(item);
-
-        return mapper.toDto(saved);
+        // 6) Return the saved bid
+        return mapper.toDto(savedBid);
     }
 
     /**
@@ -131,20 +208,45 @@ public class BidServiceImpl implements BidService {
 //    }
 
 
-    @Override
-    public List<BidDto> getBidsByAuction(int auctionId) {
-        return bidRepo.findAllByAuctionItem_Id((long)auctionId)
-                      .stream()
-                      .map(mapper::toDto)
-                      .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<BidDto> getBidsByAuction(int auctionId) {
+//        return bidRepo.findAllByAuctionItem_Id((long)auctionId)
+//                      .stream()
+//                      .map(mapper::toDto)
+//                      .collect(Collectors.toList());
+//    }
+//
+//    @Override
+//    public List<BidDto> getBidsByBuyer(int buyerId) {
+//        return bidRepo.findAllByBuyer_UserId(buyerId)
+//                      .stream()
+//                      .map(mapper::toDto)
+//                      .collect(Collectors.toList());
+//    }
+@Override
+public List<BidDto> getBidsByAuction(int auctionId) {
+    AuctionItems item = itemsRepo
+            .findByAuctionIdNative(auctionId)
+            .orElseThrow(() -> new AuctionItemNotFoundException(
+                    "Auction not found: " + auctionId));
+
+    return bidRepo.findAllByAuctionItem_Id(item.getId())
+            .stream()
+            .map(mapper::toDto)
+            .collect(Collectors.toList());
+}
 
     @Override
     public List<BidDto> getBidsByBuyer(int buyerId) {
+        // Ensure buyer exists
+        usersRepo.findById(buyerId)
+                .orElseThrow(() -> new UserNotFound(
+                        "Buyer not found: " + buyerId));
+
         return bidRepo.findAllByBuyer_UserId(buyerId)
-                      .stream()
-                      .map(mapper::toDto)
-                      .collect(Collectors.toList());
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     public String removebid(int bid_id,int auction_id) {
