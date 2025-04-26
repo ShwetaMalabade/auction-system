@@ -89,12 +89,12 @@ public class AuctionItemsController {
     }
 
     @PostMapping(
-            value = "/upload",
+            value = "/{seller_id}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<Void> uploadAuctionItem(
           //  @RequestParam int auctionId,
-          @RequestParam("seller_id") int sellerId,
+          @PathVariable("seller_id") int sellerId,
           @RequestParam("item_name") String itemName,
           @RequestParam("category") Category category,
           @RequestParam("starting_price") Double startingPrice,
