@@ -59,6 +59,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
     @Override
     public AuctionItemDto insertAuctionItem(AuctionItemDto auctionItemDto) {
+        log.info("Inserting new Auction Item");
         // Verify the seller exists and is of role SELLER
         Users seller = userRepository.findByUserId(auctionItemDto.getSellerId());
         if (seller == null || !RoleType.SELLER.equals(seller.getRole())) {
