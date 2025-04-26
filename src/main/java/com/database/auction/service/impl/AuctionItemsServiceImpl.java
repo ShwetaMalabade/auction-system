@@ -1,9 +1,7 @@
 package com.database.auction.service.impl;
 
 
-import com.database.auction.dto.AuctionItemDto;
-import com.database.auction.dto.AuctionItemSellerSummaryDto;
-import com.database.auction.dto.AuctionItemSummaryDto;
+import com.database.auction.dto.*;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.entity.Bid;
@@ -12,17 +10,21 @@ import com.database.auction.enums.Category;
 import com.database.auction.enums.RoleType;
 import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
+import com.database.auction.mapper.QuestionRowMapper;
 import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.repository.BidRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.AuctionItemsService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,15 +36,17 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     private final AuctionItemsMapper auctionItemsMapper;
     private final UsersRepository userRepository;
     private final BidRepository bidRepo;
+    private final JdbcTemplate jdbc;
 
     @Autowired
     public AuctionItemsServiceImpl(AuctionItemsRepository auctionItemsRepository,
                                    AuctionItemsMapper auctionItemsMapper, UsersRepository userRepository,
-                                   BidRepository bidRepo) {
+                                   BidRepository bidRepo,JdbcTemplate jdbc) {
         this.auctionItemsRepository = auctionItemsRepository;
         this.auctionItemsMapper = auctionItemsMapper;
         this.userRepository = userRepository;
         this.bidRepo = bidRepo;
+        this.jdbc = jdbc;
     }
 
     @Override
@@ -148,6 +152,137 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             return dto;
         }).collect(Collectors.toList());
     }
+    public String updateanswer(int question_id,int auction_id,String answer) {
+        System.out.println("In Service Implementation");
+        // fetch the username for this userId
+
+        // reuse your JDBC-based loader
+        System.out.println(auction_id);
+        String sql = """
+        
+            UPDATE auction_questions q
+            SET  q.answer = ?
+            WHERE q.question_id = ? and q.auction_id=?;
+        """;
+
+        int rows= jdbc.update(
+                sql,
+                answer,
+                question_id,auction_id
+
+        );
+        System.out.println("Rows updated: " + rows);
+
+        if (rows != 1) {
+
+            throw new EntityNotFoundException("Question not found: " + question_id);
+        }
+
+        return "Answer Change Successfully";
+    }
+
+    public String insertquestion(int auctionId, String question) {
+        System.out.println("In Service Implementation");
+        System.out.println("Auction ID: " + auctionId);
+        System.out.println("Question: " + question);
+
+        String sql = """
+        INSERT INTO auction_questions (auction_id, question)
+        VALUES (?, ?)
+        """;
+
+        int rowsAffected = jdbc.update(sql, auctionId, question);
+        System.out.println("Rows inserted: " + rowsAffected);
+
+        if (rowsAffected != 1) {
+            throw new IllegalStateException(
+                    "Failed to insert question for auction ID " + auctionId);
+        }
+
+        return "Question inserted successfully";
+    }
+
+    public List<QuestionDTO> getallquessans(int auction_id) {
+        System.out.println("In Service Implementation");
+        log.info("Fetching questions for auction_id: {}", auction_id);
+
+        // SQL should use IS NOT NULL for checking non-null answers
+        String sql = """
+        SELECT *
+          FROM auction_questions 
+         WHERE auction_id = ?
+           AND answer IS NOT NULL
+    """;
+
+        List<QuestionDTO> list = jdbc.query(
+                sql,
+                new Object[]{ auction_id },
+                (rs, rowNum) -> {
+                    QuestionDTO q = new QuestionDTO();
+                    q.setQuestionId(  rs.getInt    ("question_id"));
+                    q.setAuctionId(   rs.getInt    ("auction_id"));
+                    q.setQuestion(    rs.getString ("question"));
+                    q.setAnswer(      rs.getString ("answer"));
+
+                    return q;
+                }
+        );
+
+        if (list.isEmpty()) {
+            throw new EntityNotFoundException("No answered questions found for auction_id: " + auction_id);
+        }
+
+        return list;
+    }
+
+
+    public List<AuctionItemDto> getSalesReportByAuctionId(Integer auctionId) {
+        System.out.println("In Service Implementation");
+
+        if (auctionId == null) {
+            throw new IllegalArgumentException("auctionId must be provided");
+        }
+
+        String sql = """
+        SELECT *
+          FROM auction
+         WHERE auction_id = ?
+        """;
+
+        List<AuctionItemDto> list = jdbc.query(
+                sql,
+                new Object[]{ auctionId },
+                (rs, rowNum) -> {
+                    AuctionItemDto p = new AuctionItemDto();
+                    p.setItemName(      rs.getString("item_name"));
+                    p.setStartingPrice( rs.getDouble("starting_price"));
+                    p.setBidIncrement(  rs.getDouble("bid_increment"));
+                    p.setSellerId(      rs.getInt("seller_id"));
+                    p.setCategory(      rs.getObject("category", Category.class));
+                    p.setClosingTime(   rs.getDate("closing_time"));
+                    p.setDescription(   rs.getString("description"));
+                    p.setCurrentBid(    rs.getDouble("current_bid"));
+                    return p;
+                }
+        );
+
+        if (list.isEmpty()) {
+            throw new EntityNotFoundException("No items found for auctionId=" + auctionId);
+        }
+
+        return list;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

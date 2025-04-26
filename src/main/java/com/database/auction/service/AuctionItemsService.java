@@ -4,6 +4,7 @@ package com.database.auction.service;
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSellerSummaryDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
+import com.database.auction.dto.QuestionDTO;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
 
@@ -17,4 +18,9 @@ public interface AuctionItemsService {
     List<AuctionItemSummaryDto> findAuctionItemsByCategory(Category category);
     AuctionItemDto insertAuctionItem(AuctionItemDto auctionItemDto);
     List<AuctionItemSellerSummaryDto> findSellerSummary(int sellerId);
+    String updateanswer(int question_id,int auction_id,String answer);
+    String insertquestion(int auctionId, String question);
+    List<QuestionDTO> getallquessans(int auction_id);
+    List<AuctionItemDto> getSalesReportByAuctionId(Integer auctionId);
+
 }

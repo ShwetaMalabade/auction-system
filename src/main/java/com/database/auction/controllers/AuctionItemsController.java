@@ -4,6 +4,7 @@ package com.database.auction.controllers;
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSellerSummaryDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
+import com.database.auction.dto.QuestionDTO;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
@@ -173,6 +174,59 @@ public class AuctionItemsController {
         List<AuctionItemSellerSummaryDto> list = auctionItemsService.findSellerSummary(sellerId);
         return ResponseEntity.ok(list);
     }
+
+    @PostMapping(value="/update_answer/{question_id}/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
+    public String updateanswer(
+            @PathVariable int question_id,
+            @PathVariable int auction_id,
+		    @RequestBody QuestionDTO quesdto)
+    {
+        System.out.println("In Controller");
+
+        return auctionItemsService.updateanswer(question_id,auction_id,quesdto.getAnswer());
+
+    }
+
+    @PutMapping(value="/insertquestion/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
+    public String insertquestion(
+
+            @PathVariable int auction_id,
+            @RequestBody QuestionDTO quesdto)
+    {
+        System.out.println("In Controller");
+
+        return auctionItemsService.insertquestion(auction_id,quesdto.getQuestion());
+
+    }
+
+    @GetMapping(
+            value = "/getallquessans/{auction_id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<QuestionDTO>> getAllQuesAndAns(
+            @PathVariable("auction_id") int auction_id) {
+        System.out.println("In Controller");
+        log.info("auction_id: {}", auction_id);
+
+        List<QuestionDTO> questions = auctionItemsService.getallquessans(auction_id);
+
+        if (questions.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(questions);
+    }
+
+    @GetMapping("/getSalesReportByAuctionId/{auction_id}")
+    public List<AuctionItemDto> getSalesReportByAuctionId(
+            @PathVariable Integer auction_id
+            )
+    {
+        System.out.println("In Controller");
+        log.info("auction_id"+auction_id );
+        return auctionItemsService.getSalesReportByAuctionId(auction_id);
+    }
+
+
 
 
 }
