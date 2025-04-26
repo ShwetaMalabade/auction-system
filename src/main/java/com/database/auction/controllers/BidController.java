@@ -40,4 +40,18 @@ public class BidController {
             @PathVariable int buyerId) {
         return ResponseEntity.ok(bidService.getBidsByBuyer(buyerId));
     }
+
+    @PostMapping(value="/remove_bid/bid_id/auction_id")
+    public String removebid(
+            @PathVariable int bid_id,
+            @PathVariable int auction_id)
+    {
+        System.out.println("In Controller");
+
+        return bidService.removebid(bid_id,auction_id);
+
+    }
+
+
+
 }
