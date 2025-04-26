@@ -94,17 +94,17 @@ public class AuctionItemsController {
     )
     public ResponseEntity<Void> uploadAuctionItem(
           //  @RequestParam int auctionId,
-            @RequestParam int sellerId,
-            @RequestParam String itemName,
-            @RequestParam Category category,
-            @RequestParam Double startingPrice,
-            @RequestParam Double bidIncrement,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime closingTime,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) Double currentBid,
-            @RequestParam("images") MultipartFile[] images
+          @RequestParam("seller_id") int sellerId,
+          @RequestParam("item_name") String itemName,
+          @RequestParam("category") Category category,
+          @RequestParam("starting_price") Double startingPrice,
+          @RequestParam("bid_increment") Double bidIncrement,
+          @RequestParam("closing_time")
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+          LocalDateTime closingTime,
+          @RequestParam(value = "description", required = false) String description,
+          @RequestParam(value = "current_bid", required = false) Double currentBid,
+          @RequestParam("images") MultipartFile[] images
     ) throws IOException {
         log.info("inserting the images");
         // Convert LocalDateTime to java.util.Date
