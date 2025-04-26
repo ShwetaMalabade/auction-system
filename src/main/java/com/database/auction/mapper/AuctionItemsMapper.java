@@ -62,11 +62,22 @@ public class AuctionItemsMapper {
             return null;
         }
         AuctionItemSummaryDto summaryDto = new AuctionItemSummaryDto();
-        List<String> firstImageOnly = auctionItem.getImages().stream()
-                .map(AuctionImage::getImageUrl)
-                .limit(1)  // <-- stops after the first element
+//        List<String> firstImageOnly = auctionItem.getImages().stream()
+//                .map(AuctionImage::getImageUrl)
+//                .limit(1)  // <-- stops after the first element
+//                .collect(Collectors.toList());
+//        summaryDto.setImages(firstImageOnly);
+
+        List<String> firstImageUrl = auctionItem.getImages().stream()
+                .limit(1)
+                .map(img -> "http://localhost:8080/auth/auction-items/"
+                        + auctionItem.getId()
+                        + "/images/"
+                        + img.getId())
                 .collect(Collectors.toList());
-        summaryDto.setImages(firstImageOnly);
+        summaryDto.setImages(firstImageUrl);
+
+
         summaryDto.setItemName(auctionItem.getitem_name());
         // Pass the Category enum directly instead of converting it to string.
         summaryDto.setCategory(auctionItem.getCategory());
