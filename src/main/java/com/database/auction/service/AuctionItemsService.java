@@ -2,6 +2,7 @@ package com.database.auction.service;
 
 
 import com.database.auction.dto.AuctionItemDto;
+import com.database.auction.dto.AuctionItemSellerSummaryDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
@@ -15,4 +16,5 @@ public interface AuctionItemsService {
     AuctionItemDto findAuctionItemByAuctionId(int auctionId);
     List<AuctionItemSummaryDto> findAuctionItemsByCategory(Category category);
     AuctionItemDto insertAuctionItem(AuctionItemDto auctionItemDto);
+    List<AuctionItemSellerSummaryDto> findSellerSummary(int sellerId);
 }

@@ -100,3 +100,7 @@ ALTER TABLE user_details
 
 
 ALTER TABLE auction_items DROP COLUMN reserve_price;
+
+ALTER TABLE `Auction_Items`
+  MODIFY COLUMN `auction_id` INT NOT NULL AUTO_INCREMENT,
+  ADD UNIQUE (`auction_id`);
