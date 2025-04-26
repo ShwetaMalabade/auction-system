@@ -35,7 +35,6 @@ public class BidServiceImpl implements BidService {
     private final JdbcTemplate jdbc;
     private final NotificationService notificationService;
 
-
     @Autowired
     public BidServiceImpl(BidRepository bidRepo,
                           AuctionItemsRepository itemsRepo,
@@ -48,6 +47,7 @@ public class BidServiceImpl implements BidService {
         this.mapper    = mapper;
         this.jdbc   = jdbc;
         this.notificationService = notificationService;
+
     }
 
 //    @Override

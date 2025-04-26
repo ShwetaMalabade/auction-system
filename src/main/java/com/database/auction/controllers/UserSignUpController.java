@@ -1,6 +1,7 @@
 package com.database.auction.controllers;
 
 import com.database.auction.dto.LoginDTO;
+import com.database.auction.dto.PasswordDTO;
 import com.database.auction.dto.ProfileDTO;
 import com.database.auction.dto.UsersDTO;
 import com.database.auction.service.UsersService;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +63,21 @@ public class UserSignUpController {
 
         ProfileDTO updated = usersService.updateProfileByUserId(userId, profileDto);
         return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping(value="/pwd_change/{userId}",consumes=MediaType.APPLICATION_JSON_VALUE)
+    public String pwd_Change(
+            @PathVariable int userId,
+            @RequestBody PasswordDTO password_hash)
+    {
+        System.out.println("In Controller");
+        log.info("pass" + password_hash);
+        return new String(usersService.pwd_Change(userId, password_hash.getPassword_hash()));
+        //return  usersService.pwd_Change(userId, password_hash);
+
+
+
+
     }
 
 

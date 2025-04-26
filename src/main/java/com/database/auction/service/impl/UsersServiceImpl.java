@@ -151,4 +151,34 @@ public class UsersServiceImpl implements UsersService {
         return updateProfile(user.getUsername(), dto);
     }
 
+    public String pwd_Change(int userId,String password_hash) {
+        System.out.println("In Service Implementation");
+        // fetch the username for this userId
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+        // reuse your JDBC-based loader
+        System.out.println(password_hash);
+        String sql = """
+            
+                UPDATE users u
+                SET  u.password_hash = ?
+                WHERE u.user_id = ?;
+            """;
+
+        int rows= jdbc.update(
+                sql,
+                password_hash,userId
+
+        );
+        System.out.println("Rows updated: " + rows);
+
+        if (rows != 1) {
+
+            throw new EntityNotFoundException("User not found: " + userId);
+        }
+
+            return "Password Change Successfully";
+
+    }
+
 }
