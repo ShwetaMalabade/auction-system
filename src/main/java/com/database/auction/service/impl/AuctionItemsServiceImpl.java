@@ -2,15 +2,18 @@ package com.database.auction.service.impl;
 
 
 import com.database.auction.dto.AuctionItemDto;
+import com.database.auction.dto.AuctionItemSellerSummaryDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
+import com.database.auction.entity.Bid;
 import com.database.auction.entity.Users;
 import com.database.auction.enums.Category;
 import com.database.auction.enums.RoleType;
 import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
 import com.database.auction.repository.AuctionItemsRepository;
+import com.database.auction.repository.BidRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.AuctionItemsService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,14 +33,16 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     private final AuctionItemsRepository auctionItemsRepository;
     private final AuctionItemsMapper auctionItemsMapper;
     private final UsersRepository userRepository;
-    //private final UsersRepository usersRepository;
+    private final BidRepository bidRepo;
 
     @Autowired
     public AuctionItemsServiceImpl(AuctionItemsRepository auctionItemsRepository,
-                                   AuctionItemsMapper auctionItemsMapper, UsersRepository userRepository) {
+                                   AuctionItemsMapper auctionItemsMapper, UsersRepository userRepository,
+                                   BidRepository bidRepo) {
         this.auctionItemsRepository = auctionItemsRepository;
         this.auctionItemsMapper = auctionItemsMapper;
         this.userRepository = userRepository;
+        this.bidRepo = bidRepo;
     }
 
     @Override
@@ -59,6 +65,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
     @Override
     public AuctionItemDto insertAuctionItem(AuctionItemDto auctionItemDto) {
+        log.info("Inserting new Auction Item");
         // Verify the seller exists and is of role SELLER
         Users seller = userRepository.findByUserId(auctionItemDto.getSellerId());
         if (seller == null || !RoleType.SELLER.equals(seller.getRole())) {
@@ -106,6 +113,40 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         return items.stream()
                 .map(auctionItemsMapper::toSummaryDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AuctionItemSellerSummaryDto> findSellerSummary(int sellerId) {
+        return auctionItemsRepository.findBySellerId(sellerId).stream().map(item -> {
+            AuctionItemSellerSummaryDto dto = new AuctionItemSellerSummaryDto();
+            dto.setAuctionId(item.getauction_id());
+
+            // build image URLs
+            List<String> urls = item.getImages().stream()
+                    .map(img -> "http://localhost:8080/auth/auction-items/"
+                            + item.getId()
+                            + "/images/"
+                            + img.getId())
+                    .collect(Collectors.toList());
+            dto.setImages(urls);
+
+            dto.setDescription(item.getDescription());
+            dto.setItemName(item.getitem_name());
+            dto.setCategory(item.getCategory());
+            dto.setClosingTime(item.getClosingTime());
+            dto.setCurrentBid(item.getCurrentBid());
+
+            // find highest-reserve bidder
+            List<Bid> bids = bidRepo.findAllByAuctionItem_Id(item.getId());
+            dto.setBuyerUsername(
+                    bids.stream()
+                            .max(Comparator.comparing(Bid::getReservePrice))
+                            .map(b -> b.getBuyer().getUsername())
+                            .orElse(null)
+            );
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 

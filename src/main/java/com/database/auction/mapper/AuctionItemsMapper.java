@@ -31,10 +31,18 @@ public class AuctionItemsMapper {
         dto.setClosingTime(auctionItem.getClosingTime());
         dto.setDescription(auctionItem.getDescription());
         dto.setCurrentBid(auctionItem.getCurrentBid());
+        // ← here’s the change: build full URLs
         List<String> imageUrls = auctionItem.getImages().stream()
-                .map(AuctionImage::getImageUrl)
+                //.limit(1)   //Will change later
+                .map(img -> "http://localhost:8080/auth/auction-items/"
+                        + auctionItem.getId()
+                        + "/images/"
+                        + img.getId()
+                )
                 .collect(Collectors.toList());
         dto.setImages(imageUrls);
+
+
         return dto;
     }
 
@@ -43,7 +51,7 @@ public class AuctionItemsMapper {
             return null;
         }
         AuctionItems auctionItem = new AuctionItems();
-        auctionItem.setauction_id(dto.getAuctionId());
+        //auctionItem.setauction_id(dto.getAuctionId());
         auctionItem.setseller_id(dto.getSellerId());
         auctionItem.setitem_name(dto.getItemName());
         auctionItem.setCategory(dto.getCategory());

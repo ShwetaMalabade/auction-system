@@ -2,6 +2,7 @@ package com.database.auction.controllers;
 
 
 import com.database.auction.dto.AuctionItemDto;
+import com.database.auction.dto.AuctionItemSellerSummaryDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
@@ -92,7 +93,7 @@ public class AuctionItemsController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<Void> uploadAuctionItem(
-            @RequestParam int auctionId,
+          //  @RequestParam int auctionId,
             @RequestParam int sellerId,
             @RequestParam String itemName,
             @RequestParam Category category,
@@ -105,12 +106,13 @@ public class AuctionItemsController {
             @RequestParam(required = false) Double currentBid,
             @RequestParam("images") MultipartFile[] images
     ) throws IOException {
+        log.info("inserting the images");
         // Convert LocalDateTime to java.util.Date
         Date closing = Date.from(closingTime.atZone(ZoneId.systemDefault()).toInstant());
 
         // 1) Save AuctionItems
         AuctionItems item = new AuctionItems();
-        item.setauction_id(auctionId);
+       // item.setauction_id(auctionId);
         item.setseller_id(sellerId);
         item.setitem_name(itemName);
         item.setCategory(category);
@@ -162,6 +164,14 @@ public class AuctionItemsController {
                 .ok()
                 .contentType(mediaType)
                 .body(img.getImageData());
+    }
+
+    /** Seller summary: highest-reserve buyer per auction */
+    @GetMapping("/summarySeller/{sellerId}")
+    public ResponseEntity<List<AuctionItemSellerSummaryDto>> getSellerSummary(
+            @PathVariable int sellerId) {
+        List<AuctionItemSellerSummaryDto> list = auctionItemsService.findSellerSummary(sellerId);
+        return ResponseEntity.ok(list);
     }
 
 
