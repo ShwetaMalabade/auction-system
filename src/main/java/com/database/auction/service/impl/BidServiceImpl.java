@@ -12,8 +12,10 @@ import com.database.auction.repository.BidRepository;
 import com.database.auction.repository.UsersRepository;
 import com.database.auction.service.BidService;
 import com.database.auction.service.NotificationService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -30,6 +32,7 @@ public class BidServiceImpl implements BidService {
     private final AuctionItemsRepository itemsRepo;
     private final UsersRepository usersRepo;
     private final BidMapper mapper;
+    private final JdbcTemplate jdbc;
     private final NotificationService notificationService;
 
 
@@ -37,12 +40,13 @@ public class BidServiceImpl implements BidService {
     public BidServiceImpl(BidRepository bidRepo,
                           AuctionItemsRepository itemsRepo,
                           UsersRepository usersRepo,
-                          BidMapper mapper,
+                          BidMapper mapper,JdbcTemplate jdbc,
                           NotificationService notificationService) {
         this.bidRepo   = bidRepo;
         this.itemsRepo = itemsRepo;
         this.usersRepo = usersRepo;
         this.mapper    = mapper;
+        this.jdbc   = jdbc;
         this.notificationService = notificationService;
     }
 
@@ -244,4 +248,33 @@ public List<BidDto> getBidsByAuction(int auctionId) {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public String removebid(int bid_id,int auction_id) {
+        System.out.println("In Service Implementation");
+        // fetch the username for this userId
+
+        // reuse your JDBC-based loader
+        System.out.println(auction_id);
+        String sql = """
+        
+           delete from bids u
+            WHERE u.bid_id = ? and u.auction_id=?;
+        """;
+
+        int rows= jdbc.update(
+                sql,
+                bid_id,
+                auction_id
+
+        );
+        System.out.println("Rows updated: " + rows);
+
+        if (rows != 1) {
+
+            throw new EntityNotFoundException("BidId not found: " + bid_id);
+        }
+
+        return "Bid Deleted Successfully";
+    }
+
 }
