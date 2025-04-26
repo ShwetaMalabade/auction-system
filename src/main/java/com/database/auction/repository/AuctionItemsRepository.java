@@ -21,4 +21,7 @@ public interface AuctionItemsRepository extends JpaRepository<AuctionItems, Long
     Optional<AuctionItems> findByAuctionIdNative(@Param("auctionId") int auctionId);
 
     List<AuctionItems> findAllByCategory(Category category);
+    /** Returns the current maximum id in the table, or 0 if empty */
+    @Query("SELECT COALESCE(MAX(a.id), 0) FROM AuctionItems a")
+    Long findMaxId();
 }

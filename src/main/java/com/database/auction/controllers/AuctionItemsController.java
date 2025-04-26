@@ -3,18 +3,30 @@ package com.database.auction.controllers;
 
 import com.database.auction.dto.AuctionItemDto;
 import com.database.auction.dto.AuctionItemSummaryDto;
+import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
 import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
+import com.database.auction.repository.AuctionImageRepository;
 import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.service.AuctionItemsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
@@ -26,10 +38,14 @@ public class AuctionItemsController {
     private final AuctionItemsService auctionItemsService;
     private AuctionItemsRepository auctionItemsRepository;
     private AuctionItemsMapper auctionItemsMapper;
+    private AuctionImageRepository imagesRepo;
 
     @Autowired
-    public AuctionItemsController(AuctionItemsService auctionItemsService) {
+    public AuctionItemsController(AuctionItemsService auctionItemsService,AuctionItemsRepository itemsRepo,
+                                  AuctionImageRepository imagesRepo) {
         this.auctionItemsService = auctionItemsService;
+        this.auctionItemsRepository = itemsRepo;
+        this.imagesRepo = imagesRepo;
     }
 
     // Endpoint to retrieve all auction items
@@ -70,4 +86,83 @@ public class AuctionItemsController {
         AuctionItemDto dto = auctionItemsService.findAuctionItemByAuctionId(auctionId);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping(
+            value = "/upload",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Void> uploadAuctionItem(
+            @RequestParam int auctionId,
+            @RequestParam int sellerId,
+            @RequestParam String itemName,
+            @RequestParam Category category,
+            @RequestParam Double startingPrice,
+            @RequestParam Double bidIncrement,
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime closingTime,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Double currentBid,
+            @RequestParam("images") MultipartFile[] images
+    ) throws IOException {
+        // Convert LocalDateTime to java.util.Date
+        Date closing = Date.from(closingTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        // 1) Save AuctionItems
+        AuctionItems item = new AuctionItems();
+        item.setauction_id(auctionId);
+        item.setseller_id(sellerId);
+        item.setitem_name(itemName);
+        item.setCategory(category);
+        item.setStartingPrice(startingPrice);
+        item.setbid_increment(bidIncrement);
+        item.setClosingTime(closing);
+        item.setDescription(description);
+        item.setCurrentBid(currentBid != null ? currentBid : startingPrice);
+
+        // ────────────────────────────────────────────────────────────
+        // ★ Here’s the new bit: manually assign the primary key ★
+        Long maxId = auctionItemsRepository.findMaxId();      // calls your @Query MAX(id)
+        item.setId(maxId + 1);                   // next sequential id
+        // ────────────────────────────────────────────────────────────
+        AuctionItems saved = auctionItemsRepository.save(item);
+
+
+        // 2) Save uploaded images
+        for (MultipartFile file : images) {
+            AuctionImage img = new AuctionImage();
+            img.setImageUrl(file.getOriginalFilename());
+            img.setAuctionItem(saved);
+            img.setImageData(file.getBytes());
+            imagesRepo.save(img);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{itemId}/images/{imageId}")
+    public ResponseEntity<byte[]> getImage(
+            @PathVariable Long itemId,
+            @PathVariable Long imageId) {
+
+        Optional<AuctionImage> opt = imagesRepo.findById(imageId);
+        if (opt.isEmpty() || !opt.get().getAuctionItem().getId().equals(itemId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        AuctionImage img = opt.get();
+        // Determine MIME type if you stored it, otherwise default to JPEG
+        MediaType mediaType = MediaType.IMAGE_JPEG;
+        // If file name ends with .png, you could switch:
+        if (img.getImageUrl().toLowerCase().endsWith(".png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        }
+
+        return ResponseEntity
+                .ok()
+                .contentType(mediaType)
+                .body(img.getImageData());
+    }
+
+
 }
