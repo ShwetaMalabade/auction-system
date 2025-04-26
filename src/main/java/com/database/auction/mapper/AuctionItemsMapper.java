@@ -33,7 +33,7 @@ public class AuctionItemsMapper {
         dto.setCurrentBid(auctionItem.getCurrentBid());
         // ← here’s the change: build full URLs
         List<String> imageUrls = auctionItem.getImages().stream()
-                //.limit(1)   //Will change later
+                .limit(1)   //Will change later
                 .map(img -> "http://localhost:8080/auth/auction-items/"
                         + auctionItem.getId()
                         + "/images/"
