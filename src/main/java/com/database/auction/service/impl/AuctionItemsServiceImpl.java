@@ -140,14 +140,22 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             dto.setClosingTime(item.getClosingTime());
             dto.setCurrentBid(item.getCurrentBid());
             dto.setMinPrice(item.getMinPrice());
-            // find highest-reserve bidder
-            List<Bid> bids = bidRepo.findAllByAuctionItem_Id(item.getId());
-            dto.setBuyerUsername(
-                    bids.stream()
-                            .max(Comparator.comparing(Bid::getReservePrice))
-                            .map(b -> b.getBuyer().getUsername())
-                            .orElse(null)
-            );
+//            // find highest-reserve bidder
+//            List<Bid> bids = bidRepo.findAllByAuctionItem_Id(item.getId());
+//            dto.setBuyerUsername(
+//                    bids.stream()
+//                            .max(Comparator.comparing(Bid::getReservePrice))
+//                            .map(b -> b.getBuyer().getUsername())
+//                            .orElse(null)
+//            );
+
+            Integer winnerId = item.getWinningBuyerId();
+            if (winnerId != null) {
+                userRepository.findById(winnerId)
+                        .ifPresent(u -> dto.setBuyerUsername(u.getUsername()));
+            } else {
+                dto.setBuyerUsername(null);
+            }
 
             return dto;
         }).collect(Collectors.toList());
