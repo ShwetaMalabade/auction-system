@@ -1,10 +1,7 @@
 package com.database.auction.service;
 
 
-import com.database.auction.dto.AuctionItemDto;
-import com.database.auction.dto.AuctionItemSellerSummaryDto;
-import com.database.auction.dto.AuctionItemSummaryDto;
-import com.database.auction.dto.QuestionDTO;
+import com.database.auction.dto.*;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
 
@@ -25,4 +22,6 @@ public interface AuctionItemsService {
     List<AuctionItemDto> getsalesreportByCategory(String category);
     List<AuctionItemDto> getsalesreportBySellerId(Integer seller_id);
     List<AuctionItemDto> getsalesreport();
+    /** Get all orders a buyer has won (only past auctions) */
+    List<BuyerOrderDTO> findOrdersByBuyer(int buyerId);
 }

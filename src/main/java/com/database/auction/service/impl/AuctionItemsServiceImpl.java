@@ -22,10 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -403,7 +400,34 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         return list;
     }
 
+    @Override
+    public List<BuyerOrderDTO> findOrdersByBuyer(int buyerId) {
+        Date now = new Date();
+        return auctionItemsRepository
+                .findByWinningBuyerIdAndClosingTimeBefore(buyerId, now)
+                .stream()
+                .map(item -> {
+                    BuyerOrderDTO dto = new BuyerOrderDTO();
+                    dto.setAuctionId(item.getauction_id());
 
+                    List<String> urls = item.getImages().stream()
+                            .limit(1)
+                            .map(img -> "http://localhost:8080/auth/auction-items/"
+                                    + item.getId()
+                                    + "/images/"
+                                    + img.getId())
+                            .collect(Collectors.toList());
+                    dto.setImages(urls);
+
+                    dto.setDescription(item.getDescription());
+                    dto.setItemName(item.getitem_name());
+                    dto.setCategory(item.getCategory());
+                    dto.setCurrentBid(item.getCurrentBid());
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 
 

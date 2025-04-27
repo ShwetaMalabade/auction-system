@@ -38,7 +38,7 @@ public class AuctionItems {
 
     @Column(name = "closing_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date closing_time;
+    private Date closingTime;
 
     @Column(name = "description")
     private String description;
@@ -146,11 +146,11 @@ public class AuctionItems {
 //    }
 
     public Date getClosingTime() {
-        return closing_time;
+        return closingTime;
     }
 
     public void setClosingTime(Date closing_time) {
-        this.closing_time = closing_time;
+        this.closingTime = closing_time;
     }
 
     public String getDescription() {
@@ -195,7 +195,7 @@ public class AuctionItems {
                 ", startingPrice=" + starting_price +
                 ", bid_increment=" + bid_increment +
                 //", reserve_price=" + reserve_price +
-                ", closingTime=" + closing_time +
+                ", closingTime=" + closingTime +
                 ", description='" + description + '\'' +
                 ", images=" + images +
                 '}';

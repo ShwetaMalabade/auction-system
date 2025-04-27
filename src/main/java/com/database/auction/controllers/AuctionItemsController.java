@@ -1,10 +1,7 @@
 package com.database.auction.controllers;
 
 
-import com.database.auction.dto.AuctionItemDto;
-import com.database.auction.dto.AuctionItemSellerSummaryDto;
-import com.database.auction.dto.AuctionItemSummaryDto;
-import com.database.auction.dto.QuestionDTO;
+import com.database.auction.dto.*;
 import com.database.auction.entity.AuctionImage;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.enums.Category;
@@ -315,7 +312,13 @@ public class AuctionItemsController {
         return ResponseEntity.ok(list.get(bestIndex));
     }
 
-
+    @GetMapping("/buyer/{buyerId}/orders")
+    public ResponseEntity<List<BuyerOrderDTO>> getMyOrders(
+            @PathVariable("buyerId") int buyerId) {
+        log.info("Inside the buyers orderid"+buyerId);
+        List<BuyerOrderDTO> orders = auctionItemsService.findOrdersByBuyer(buyerId);
+        return ResponseEntity.ok(orders);
+    }
 
 
 

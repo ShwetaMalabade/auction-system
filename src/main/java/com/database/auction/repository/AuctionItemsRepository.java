@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,4 +29,7 @@ public interface AuctionItemsRepository extends JpaRepository<AuctionItems, Long
     /** Find all auctions listed by a given seller_id */
     @Query("SELECT a FROM AuctionItems a WHERE a.seller_id = :sellerId")
     List<AuctionItems> findBySellerId(@Param("sellerId") int sellerId);
+
+    /** Find closed auctions where the given buyer was recorded as winner */
+    List<AuctionItems> findByWinningBuyerIdAndClosingTimeBefore(Integer buyerId, Date now);
 }
