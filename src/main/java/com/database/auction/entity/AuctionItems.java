@@ -46,9 +46,16 @@ public class AuctionItems {
     @Column(name = "current_bid")
     private Double currentBid;
 
+    @Column(name = "start_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
+
     // One auction item can have many images.
     @OneToMany(mappedBy = "auctionItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AuctionImage> images = new ArrayList<>();
+
+    @Column(name = "min_price")
+    private Double minPrice;
 
     public AuctionItems() {
     }
@@ -150,6 +157,21 @@ public class AuctionItems {
 
     public void setImages(List<AuctionImage> images) {
         this.images = images;
+    }
+
+    public Double getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(Double minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     @Override

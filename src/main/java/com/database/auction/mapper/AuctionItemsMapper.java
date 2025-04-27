@@ -31,6 +31,7 @@ public class AuctionItemsMapper {
         dto.setClosingTime(auctionItem.getClosingTime());
         dto.setDescription(auctionItem.getDescription());
         dto.setCurrentBid(auctionItem.getCurrentBid());
+        dto.setStartTime(auctionItem.getStartTime());
         // ← here’s the change: build full URLs
         List<String> imageUrls = auctionItem.getImages().stream()
                 .limit(1)   //Will change later
@@ -89,6 +90,7 @@ public class AuctionItemsMapper {
         summaryDto.setItemName(auctionItem.getitem_name());
         // Pass the Category enum directly instead of converting it to string.
         summaryDto.setCategory(auctionItem.getCategory());
+        summaryDto.setStartTime(auctionItem.getStartTime());
         //summaryDto.setStartingPrice(auctionItem.getStartingPrice());
         summaryDto.setCurrentBid(auctionItem.getCurrentBid());
         summaryDto.setClosingTime(auctionItem.getClosingTime());

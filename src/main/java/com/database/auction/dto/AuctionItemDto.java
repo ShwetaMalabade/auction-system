@@ -15,7 +15,8 @@ public class AuctionItemDto {
     private Category category;
     private Double starting_price;
     private Double bidIncrement;
-//    private Double reserve_price;
+    private Date startTime;
+    //    private Double reserve_price;
     private Date closingTime;
     private String description;
     private Double currentBid;
@@ -92,13 +93,12 @@ public class AuctionItemDto {
         this.bidIncrement = bidIncrement;
     }
 
-//    public Double getreserve_price() {
-//        return reserve_price;
-//    }
-//
-//    public void setreserve_price(Double reserve_price) {
-//        this.reserve_price = reserve_price;
-//    }
+    public Date getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
     public Date getClosingTime() {
         return closingTime;
