@@ -57,10 +57,20 @@ public class AuctionItems {
     @Column(name = "min_price")
     private Double minPrice;
 
+    @Column(name = "buyer_id")
+    private Integer winningBuyerId;
+
     public AuctionItems() {
     }
 
     // Getters and setters for all fields
+
+    public Integer getWinningBuyerId() {
+        return winningBuyerId;
+    }
+    public void setWinningBuyerId(Integer winningBuyerId) {
+        this.winningBuyerId = winningBuyerId;
+    }
 
     public Long getId() {
         return id;
