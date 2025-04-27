@@ -215,6 +215,7 @@ public class AuctionItemsController {
         }
         return ResponseEntity.ok(questions);
     }
+//Report based on Item
 
     @GetMapping("/getSalesReportByAuctionId/{auction_id}")
     public List<AuctionItemDto> getSalesReportByAuctionId(
@@ -225,6 +226,38 @@ public class AuctionItemsController {
         log.info("auction_id"+auction_id );
         return auctionItemsService.getSalesReportByAuctionId(auction_id);
     }
+
+    @GetMapping("/getsalesreport")
+    public List<AuctionItemDto> getsalesreport(
+           )
+    {
+        System.out.println("In Controller");
+
+        return auctionItemsService.getsalesreport();
+    }
+
+    @GetMapping("/getsalesreportByCategory/{category}")
+    public List<AuctionItemDto> getsalesreportByCategory(
+
+            @PathVariable String category)
+    {
+        System.out.println("In Controller");
+        log.info("category"+category );
+        return auctionItemsService.getsalesreportByCategory(category);
+    }
+
+
+    @GetMapping("/getsalesreportBySellerId/{seller_id}")
+    public List<AuctionItemDto> getsalesreportBySellerId(
+
+            @PathVariable Integer seller_id)
+    {
+        System.out.println("In Controller");
+        log.info("seller_id"+seller_id );
+        return auctionItemsService.getsalesreportBySellerId(seller_id);
+    }
+
+
 
 
 
