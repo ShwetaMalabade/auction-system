@@ -275,6 +275,44 @@ public class AuctionItemsController {
         return ResponseEntity.ok(auctionItemsService.getsalesreportBySellerId(seller_id));
     }
 
+    @GetMapping("/bestsellingitem/getsalesreport")
+    public ResponseEntity<AuctionItemDto> getBestSellingItemSalesReport() {
+        System.out.println("In Controller");
+
+        List<AuctionItemDto> list = auctionItemsService.getsalesreport();
+
+        if (list.isEmpty()) {
+            // no data
+            return ResponseEntity.noContent().build();
+        }
+
+        double maxDiv = Double.NEGATIVE_INFINITY;
+        int bestIndex = 0;
+
+        for (int i = 0; i < list.size(); i++) {
+            AuctionItemDto dto = list.get(i);
+
+            // guard nulls—skip any record missing the bids
+            if (dto.getCurrentBid() == null || dto.getStartingPrice() == null) {
+                continue;
+            }
+
+            double upper = dto.getCurrentBid() - dto.getStartingPrice();
+            double div   = upper / dto.getCurrentBid() * 100.0;
+
+            if (div > maxDiv) {
+                maxDiv    = div;
+                bestIndex = i;
+            }
+        }
+
+        // If we never found a valid record, return no content
+        if (bestIndex < 0 || bestIndex >= list.size() || maxDiv == Double.NEGATIVE_INFINITY) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(list.get(bestIndex));
+    }
 
 
 
