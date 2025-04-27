@@ -257,8 +257,8 @@ public List<BidDto> getBidsByAuction(int auctionId) {
         System.out.println(auction_id);
         String sql = """
         
-           delete from bids u
-            WHERE u.bid_id = ? and u.auction_id=?;
+           delete from bids 
+            WHERE bid_id = ? and auction_id=?;
         """;
 
         int rows= jdbc.update(
