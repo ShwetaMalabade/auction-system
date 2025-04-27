@@ -139,7 +139,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             dto.setCategory(item.getCategory());
             dto.setClosingTime(item.getClosingTime());
             dto.setCurrentBid(item.getCurrentBid());
-
+            dto.setMinPrice(item.getMinPrice());
             // find highest-reserve bidder
             List<Bid> bids = bidRepo.findAllByAuctionItem_Id(item.getId());
             dto.setBuyerUsername(

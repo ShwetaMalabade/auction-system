@@ -17,6 +17,7 @@ public class AuctionItemSellerSummaryDto {
     private Double currentBid;
     //private Integer buyerId;  // null if no bids
     private String buyerUsername;
+    private Double minPrice;
 
     public int getAuctionId() { return auctionId; }
     public void setAuctionId(int auctionId) { this.auctionId = auctionId; }
@@ -48,4 +49,7 @@ public class AuctionItemSellerSummaryDto {
     public String getBuyerUsername() {
         return buyerUsername;
     }
+
+    public Double getMinPrice() { return minPrice; }
+    public void setMinPrice(Double minPrice) { this.minPrice = minPrice; }
 }

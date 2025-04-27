@@ -103,7 +103,11 @@ public class AuctionItemsController {
           @RequestParam("closing_time")
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime closingTime,
+          @RequestParam("start_time")
+          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+          LocalDateTime startTime,
           @RequestParam(value = "description", required = false) String description,
+          @RequestParam("min_price")       Double minPrice,
           @RequestParam(value = "current_bid", required = false) Double currentBid,
           @RequestParam("images") MultipartFile[] images
     ) throws IOException {
@@ -119,9 +123,11 @@ public class AuctionItemsController {
         item.setCategory(category);
         item.setStartingPrice(startingPrice);
         item.setbid_increment(bidIncrement);
+        item.setStartTime(Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant()));
         item.setClosingTime(closing);
         item.setDescription(description);
         item.setCurrentBid(currentBid != null ? currentBid : startingPrice);
+        item.setMinPrice(minPrice);
 
         // ────────────────────────────────────────────────────────────
         // ★ Here’s the new bit: manually assign the primary key ★

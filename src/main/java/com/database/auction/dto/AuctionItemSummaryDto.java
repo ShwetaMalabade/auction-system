@@ -15,6 +15,7 @@ public class AuctionItemSummaryDto {
    // private Double starting_price;
     private Date closing_time;
     private Double currentBid;
+    private Date startTime;
 
     public AuctionItemSummaryDto() {
     }
@@ -70,8 +71,13 @@ public class AuctionItemSummaryDto {
     public void setItemName(String itemName) {
         this.item_name = itemName;
     }
- 
 
+    public Date getStartTime() {
+        return startTime;
+    }
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
  
 //    public Double getStartingPrice() {
 //        return starting_price;
