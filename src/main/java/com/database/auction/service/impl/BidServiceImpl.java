@@ -111,6 +111,16 @@ public class BidServiceImpl implements BidService {
 
         double newCurrentBid = secondReserve + item.getbid_increment();
         item.setCurrentBid(newCurrentBid);
+
+        // 2) Determine which bid actually “wins” the auction floor
+        Double floor = item.getMinPrice();
+        Optional<Bid> winner = bidRepo.findAllByAuctionItem_Id(item.getId()).stream()
+                .filter(b -> b.getReservePrice() != null && b.getReservePrice() > floor)
+                .max(Comparator.comparing(Bid::getReservePrice));
+
+// 2) Update the auction row’s buyer_id
+        item.setWinningBuyerId(winner.map(b -> b.getBuyer().getUserId()).orElse(null));
+
         itemsRepo.save(item);
 
         // 5a) If this new bid DID NOT become the top, notify *this* bidder

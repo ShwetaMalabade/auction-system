@@ -111,7 +111,8 @@ public class AuctionItemsController {
           @RequestParam(value = "current_bid", required = false) Double currentBid,
           @RequestParam("images") MultipartFile[] images
     ) throws IOException {
-        log.info("inserting the images");
+        log.info("inserting the items");
+        log.info("Uploaded time is "+startTime.toString());
         // Convert LocalDateTime to java.util.Date
         Date closing = Date.from(closingTime.atZone(ZoneId.systemDefault()).toInstant());
 
