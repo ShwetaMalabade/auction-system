@@ -152,7 +152,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             return dto;
         }).collect(Collectors.toList());
     }
-    public String updateanswer(int question_id,int auction_id,String answer) {
+    public int updateanswer(int question_id,int auction_id,String answer) {
         System.out.println("In Service Implementation");
         // fetch the username for this userId
 
@@ -178,10 +178,10 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
             throw new EntityNotFoundException("Question not found: " + question_id);
         }
 
-        return "Answer Change Successfully";
+        return rows;
     }
 
-    public String insertquestion(int auctionId, String question) {
+    public int insertquestion(int auctionId, String question) {
         System.out.println("In Service Implementation");
         System.out.println("Auction ID: " + auctionId);
         System.out.println("Question: " + question);
@@ -199,38 +199,38 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
                     "Failed to insert question for auction ID " + auctionId);
         }
 
-        return "Question inserted successfully";
+        return rowsAffected;
     }
 
-    public List<QuestionDTO> getallquessans(int auction_id) {
-        System.out.println("In Service Implementation");
-        log.info("Fetching questions for auction_id: {}", auction_id);
 
-        // SQL should use IS NOT NULL for checking non-null answers
+    public List<QuestionDTO> getallquessans(int auctionId) {
+        System.out.println("In Service Implementation");
+        log.info("Fetching questions for auction_id: {}", auctionId);
+
         String sql = """
         SELECT *
-          FROM auction_questions 
+          FROM auction_questions
          WHERE auction_id = ?
            AND answer IS NOT NULL
     """;
 
         List<QuestionDTO> list = jdbc.query(
                 sql,
-                new Object[]{ auction_id },
+                new Object[]{ auctionId },
                 (rs, rowNum) -> {
                     QuestionDTO q = new QuestionDTO();
-                    q.setQuestionId(  rs.getInt    ("question_id"));
-                    q.setAuctionId(   rs.getInt    ("auction_id"));
-                    q.setQuestion(    rs.getString ("question"));
-                    q.setAnswer(      rs.getString ("answer"));
-
+                    q.setQuestionId( rs.getInt("question_id"));
+                    q.setAuctionId(  rs.getInt("auction_id"));
+                    q.setQuestion(   rs.getString("question"));
+                    q.setAnswer(     rs.getString("answer"));
                     return q;
                 }
         );
 
-        if (list.isEmpty()) {
-            throw new EntityNotFoundException("No answered questions found for auction_id: " + auction_id);
-        }
+        // **Remove** the exception-throw here—let the controller handle empty lists
+        // if (list.isEmpty()) {
+        //     throw new EntityNotFoundException("No answered questions found for auction_id: " + auctionId);
+        // }
 
         return list;
     }
@@ -318,82 +318,82 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         System.out.println("In Service Implementation");
         // fetch the questions for this itemId
 
-        if (category != null) {
+        if (category == null) {
             throw new IllegalArgumentException("category must be provided");
         }
 
-            String sql = """
+        String sql = """
                        Select * from auction_items where category=?;
                     """;
 
-            List<AuctionItemDto> list = jdbc.query(
-                    sql,
-                    new Object[]{category},
-                    (rs, rowNum) -> {
-                        AuctionItemDto p = new AuctionItemDto();
-                        p.setItemName(rs.getString("item_name"));
-                        p.setStartingPrice(rs.getDouble("starting_price"));
-                        p.setBidIncrement(rs.getDouble("bid_increment"));
-                        p.setSellerId(rs.getInt("seller_id"));
-                        String cat = rs.getString("category");
-                        p.setCategory(cat == null
-                                ? null
-                                : Category.valueOf(cat));
-                        p.setClosingTime(rs.getDate("closing_time"));
-                        p.setDescription(rs.getString("description"));
-                        p.setCurrentBid(rs.getDouble("current_bid"));
-                        return p;
-                    }
-            );
-            if (list.size() == 0) {
+        List<AuctionItemDto> list = jdbc.query(
+                sql,
+                new Object[]{category},
+                (rs, rowNum) -> {
+                    AuctionItemDto p = new AuctionItemDto();
+                    p.setItemName(rs.getString("item_name"));
+                    p.setStartingPrice(rs.getDouble("starting_price"));
+                    p.setBidIncrement(rs.getDouble("bid_increment"));
+                    p.setSellerId(rs.getInt("seller_id"));
+                    String cat = rs.getString("category");
+                    p.setCategory(cat == null
+                            ? null
+                            : Category.valueOf(cat));
+                    p.setClosingTime(rs.getDate("closing_time"));
+                    p.setDescription(rs.getString("description"));
+                    p.setCurrentBid(rs.getDouble("current_bid"));
+                    return p;
+                }
+        );
+        if (list.size() == 0) {
 
-                throw new EntityNotFoundException("Item not found: " + category);
-            }
-
-            return list;
+            throw new EntityNotFoundException("Item not found: " + category);
         }
+
+        return list;
+    }
 
 
 
     public List<AuctionItemDto> getsalesreportBySellerId(Integer seller_id) {
-            System.out.println("In Service Implementation");
-            // fetch the questions for this itemId
+        System.out.println("In Service Implementation");
+        // fetch the questions for this itemId
+        Users seller = userRepository.findByUserId(seller_id);
+        if(seller_id==null || !RoleType.SELLER.equals(seller.getRole())){
+            throw new IllegalArgumentException("Seller id must be provided");
 
-            if(seller_id!=null){
-                throw new IllegalArgumentException("Seller id must be provided");
+        }
 
-            }
-
-                String sql = """
-       Select * from auction where seller_id=?;
+        String sql = """
+       Select * from auction_items where seller_id=?;
     """;
 
-                List<AuctionItemDto> list = jdbc.query(
-                        sql,
-                        new Object[]{ seller_id },
-                        (rs, rowNum) -> {
-                            AuctionItemDto p = new AuctionItemDto();
-                            p.setItemName(      rs.getString("item_name"));
-                            p.setStartingPrice( rs.getDouble("starting_price"));
-                            p.setBidIncrement(  rs.getDouble("bid_increment"));
-                            p.setSellerId(      rs.getInt("seller_id"));
-                            String cat = rs.getString("category");
-                            p.setCategory(cat == null
-                                    ? null
-                                    : Category.valueOf(cat));
-                            p.setClosingTime(   rs.getDate("closing_time"));
-                            p.setDescription(   rs.getString("description"));
-                            p.setCurrentBid(    rs.getDouble("current_bid"));
-                            return p;
-                        }
-                );
-                if (list.size()== 0) {
-
-                    throw new EntityNotFoundException("Item not found: " + seller_id);
+        List<AuctionItemDto> list = jdbc.query(
+                sql,
+                new Object[]{ seller_id },
+                (rs, rowNum) -> {
+                    AuctionItemDto p = new AuctionItemDto();
+                    p.setItemName(      rs.getString("item_name"));
+                    p.setStartingPrice( rs.getDouble("starting_price"));
+                    p.setBidIncrement(  rs.getDouble("bid_increment"));
+                    p.setSellerId(      rs.getInt("seller_id"));
+                    String cat = rs.getString("category");
+                    p.setCategory(cat == null
+                            ? null
+                            : Category.valueOf(cat));
+                    p.setClosingTime(   rs.getDate("closing_time"));
+                    p.setDescription(   rs.getString("description"));
+                    p.setCurrentBid(    rs.getDouble("current_bid"));
+                    return p;
                 }
+        );
+        if (list.size()== 0) {
 
-                return list;
-            }
+            throw new EntityNotFoundException("Item not found: " + seller_id);
+        }
+
+        return list;
+    }
 
 
 

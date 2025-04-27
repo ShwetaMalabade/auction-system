@@ -66,19 +66,24 @@ public class UserSignUpController {
     }
 
     @PostMapping(value="/pwd_change/{userId}",consumes=MediaType.APPLICATION_JSON_VALUE)
-    public String pwd_Change(
+    public ResponseEntity<Void> pwd_Change(
             @PathVariable int userId,
             @RequestBody PasswordDTO password_hash)
     {
         System.out.println("In Controller");
         log.info("pass" + password_hash);
-        return new String(usersService.pwd_Change(userId, password_hash.getPassword_hash()));
+        int rows= usersService.pwd_Change(userId, password_hash.getPassword_hash());
         //return  usersService.pwd_Change(userId, password_hash);
 
+        if(rows>0)
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 
 
 
     }
+
 
 
 

@@ -151,7 +151,7 @@ public class UsersServiceImpl implements UsersService {
         return updateProfile(user.getUsername(), dto);
     }
 
-    public String pwd_Change(int userId,String password_hash) {
+    public int  pwd_Change(int userId,String password_hash) {
         System.out.println("In Service Implementation");
         // fetch the username for this userId
         Users user = usersRepository.findById(userId)
@@ -177,8 +177,11 @@ public class UsersServiceImpl implements UsersService {
             throw new EntityNotFoundException("User not found: " + userId);
         }
 
-            return "Password Change Successfully";
+        return rows;
 
     }
 
 }
+
+
+

@@ -182,26 +182,37 @@ public class AuctionItemsController {
     }
 
     @PostMapping(value="/update_answer/{question_id}/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
-    public String updateanswer(
+    public ResponseEntity<Void> updateanswer(
             @PathVariable int question_id,
             @PathVariable int auction_id,
-		    @RequestBody QuestionDTO quesdto)
+            @RequestBody QuestionDTO quesdto)
     {
         System.out.println("In Controller");
 
-        return auctionItemsService.updateanswer(question_id,auction_id,quesdto.getAnswer());
+
+        int affected=  auctionItemsService.updateanswer(question_id,auction_id,quesdto.getAnswer());
+
+        if(affected>0)
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 
     }
 
     @PutMapping(value="/insertquestion/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
-    public String insertquestion(
+    public ResponseEntity<Void> insertquestion(
 
             @PathVariable int auction_id,
             @RequestBody QuestionDTO quesdto)
     {
         System.out.println("In Controller");
 
-        return auctionItemsService.insertquestion(auction_id,quesdto.getQuestion());
+        int affected= auctionItemsService.insertquestion(auction_id,quesdto.getQuestion());
+
+        if(affected>0)
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 
     }
 
@@ -209,7 +220,7 @@ public class AuctionItemsController {
             value = "/getallquessans/{auction_id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<QuestionDTO>> getAllQuesAndAns(
+    public ResponseEntity<List<QuestionDTO>> getallquessans(
             @PathVariable("auction_id") int auction_id) {
         System.out.println("In Controller");
         log.info("auction_id: {}", auction_id);
@@ -221,47 +232,50 @@ public class AuctionItemsController {
         }
         return ResponseEntity.ok(questions);
     }
+
 //Report based on Item
 
     @GetMapping("/getSalesReportByAuctionId/{auction_id}")
-    public List<AuctionItemDto> getSalesReportByAuctionId(
+    public ResponseEntity<List<AuctionItemDto>> getSalesReportByAuctionId(
             @PathVariable Integer auction_id
-            )
+    )
     {
         System.out.println("In Controller");
         log.info("auction_id"+auction_id );
-        return auctionItemsService.getSalesReportByAuctionId(auction_id);
+        return ResponseEntity.ok(auctionItemsService.getSalesReportByAuctionId(auction_id));
     }
 
     @GetMapping("/getsalesreport")
-    public List<AuctionItemDto> getsalesreport(
-           )
+    public ResponseEntity<List<AuctionItemDto>> getsalesreport(
+    )
     {
         System.out.println("In Controller");
 
-        return auctionItemsService.getsalesreport();
+        return ResponseEntity.ok(auctionItemsService.getsalesreport());
     }
 
     @GetMapping("/getsalesreportByCategory/{category}")
-    public List<AuctionItemDto> getsalesreportByCategory(
+    public ResponseEntity<List<AuctionItemDto>> getsalesreportByCategory(
 
             @PathVariable String category)
     {
         System.out.println("In Controller");
         log.info("category"+category );
-        return auctionItemsService.getsalesreportByCategory(category);
+        return ResponseEntity.ok(auctionItemsService.getsalesreportByCategory(category));
     }
 
 
     @GetMapping("/getsalesreportBySellerId/{seller_id}")
-    public List<AuctionItemDto> getsalesreportBySellerId(
+    public ResponseEntity<List<AuctionItemDto>> getsalesreportBySellerId(
 
             @PathVariable Integer seller_id)
     {
         System.out.println("In Controller");
         log.info("seller_id"+seller_id );
-        return auctionItemsService.getsalesreportBySellerId(seller_id);
+        return ResponseEntity.ok(auctionItemsService.getsalesreportBySellerId(seller_id));
     }
+
+
 
 
 
