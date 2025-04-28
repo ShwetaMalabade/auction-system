@@ -21,7 +21,7 @@ public class AuctionItems {
     private int seller_id;
 
     @Column(name = "item_name")
-    private String item_name;
+    private String itemName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
@@ -105,11 +105,11 @@ public class AuctionItems {
     }
 
     public String getitem_name() {
-        return item_name;
+        return itemName;
     }
 
     public void setitem_name(String item_name) {
-        this.item_name = item_name;
+        this.itemName = item_name;
     }
 
 
@@ -190,7 +190,7 @@ public class AuctionItems {
                 "id=" + id +
                 ", auction_id=" + auction_id +
                 ", seller_id=" + seller_id +
-                ", item_name='" + item_name + '\'' +
+                ", item_name='" + itemName + '\'' +
                 ", category=" + category +
                 ", startingPrice=" + starting_price +
                 ", bid_increment=" + bid_increment +

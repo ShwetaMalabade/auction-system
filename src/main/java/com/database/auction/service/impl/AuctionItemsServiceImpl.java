@@ -430,7 +430,32 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     }
 
 
+    @Override
+    public List<AuctionItemDto> searchAuctions(String query) {
+        // 1) text‐based matches
+        List<AuctionItems> textMatches =
+                auctionItemsRepository.findByItemNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                        query, query);
 
+        // 2) numeric match if query is a number
+        List<AuctionItems> bidMatches = Collections.emptyList();
+        try {
+            Double bidVal = Double.valueOf(query);
+            bidMatches = auctionItemsRepository.findByCurrentBid(bidVal);
+        } catch (NumberFormatException e) {
+            // not a number → ignore
+        }
+
+        // 3) union + dedupe
+        Map<Long,AuctionItems> merged = new LinkedHashMap<>();
+        for (AuctionItems a: textMatches) merged.put(a.getId(), a);
+        for (AuctionItems a: bidMatches) merged.put(a.getId(), a);
+
+        // 4) map to DTOs
+        return merged.values().stream()
+                .map(auctionItemsMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
 
 

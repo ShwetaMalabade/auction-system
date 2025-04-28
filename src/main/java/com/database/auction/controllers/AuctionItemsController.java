@@ -137,7 +137,6 @@ public class AuctionItemsController {
         item.setId(maxId + 1);                   // next sequential id
         // ────────────────────────────────────────────────────────────
         AuctionItems saved = auctionItemsRepository.save(item);
-        auctionEventScheduler.scheduleEndForAuction(saved);
 
 
         // 2) Save uploaded images
@@ -148,6 +147,7 @@ public class AuctionItemsController {
             img.setImageData(file.getBytes());
             imagesRepo.save(img);
         }
+        auctionEventScheduler.scheduleEndForAuction(saved);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -325,7 +325,12 @@ public class AuctionItemsController {
         return ResponseEntity.ok(orders);
     }
 
-
+    @GetMapping("/search")
+    public ResponseEntity<List<AuctionItemDto>> search(
+            @RequestParam("q") String query) {
+        List<AuctionItemDto> results = auctionItemsService.searchAuctions(query);
+        return ResponseEntity.ok(results);
+    }
 
 
 }
