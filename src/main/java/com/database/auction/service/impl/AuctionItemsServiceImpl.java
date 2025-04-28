@@ -216,7 +216,6 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         SELECT *
           FROM auction_questions
          WHERE auction_id = ?
-           AND answer IS NOT NULL
     """;
 
         List<QuestionDTO> list = jdbc.query(
