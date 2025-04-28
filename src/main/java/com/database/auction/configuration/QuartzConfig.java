@@ -2,13 +2,16 @@ package com.database.auction.configuration;
 
 
 import com.database.auction.configuration.AutowiringSpringBeanJobFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+@Slf4j
 @Configuration
 public class QuartzConfig {
 
@@ -38,4 +41,12 @@ public class QuartzConfig {
     public Scheduler scheduler(SchedulerFactoryBean factory) {
         return factory.getScheduler();
     }
+
+    @Bean
+    public ApplicationRunner verifyQuartzUp(Scheduler scheduler) {
+        return args -> {
+            log.info("✅ Quartz scheduler started? {}", scheduler.isStarted());
+        };
+    }
+
 }

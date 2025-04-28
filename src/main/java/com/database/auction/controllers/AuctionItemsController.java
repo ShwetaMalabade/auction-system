@@ -9,8 +9,10 @@ import com.database.auction.exception.AuctionItemNotFoundException;
 import com.database.auction.mapper.AuctionItemsMapper;
 import com.database.auction.repository.AuctionImageRepository;
 import com.database.auction.repository.AuctionItemsRepository;
+import com.database.auction.scheduler.AuctionEventScheduler;
 import com.database.auction.service.AuctionItemsService;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,8 @@ public class AuctionItemsController {
     private AuctionItemsRepository auctionItemsRepository;
     private AuctionItemsMapper auctionItemsMapper;
     private AuctionImageRepository imagesRepo;
+    private AuctionEventScheduler auctionEventScheduler;
+
 
     @Autowired
     public AuctionItemsController(AuctionItemsService auctionItemsService,AuctionItemsRepository itemsRepo,
@@ -107,7 +111,7 @@ public class AuctionItemsController {
           @RequestParam("min_price")       Double minPrice,
           @RequestParam(value = "current_bid", required = false) Double currentBid,
           @RequestParam("images") MultipartFile[] images
-    ) throws IOException {
+    ) throws IOException, SchedulerException {
         log.info("inserting the items");
         log.info("Uploaded time is "+startTime.toString());
         // Convert LocalDateTime to java.util.Date
@@ -133,6 +137,7 @@ public class AuctionItemsController {
         item.setId(maxId + 1);                   // next sequential id
         // ────────────────────────────────────────────────────────────
         AuctionItems saved = auctionItemsRepository.save(item);
+        auctionEventScheduler.scheduleEndForAuction(saved);
 
 
         // 2) Save uploaded images
