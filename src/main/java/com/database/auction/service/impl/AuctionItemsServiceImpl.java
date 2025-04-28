@@ -287,7 +287,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
         String sql = """
         SELECT *
-          FROM auction_items
+          FROM auction_items where current_bid<>0
         """;
 
         List<AuctionItemDto> list = jdbc.query(

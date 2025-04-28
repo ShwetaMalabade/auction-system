@@ -52,6 +52,17 @@ public class BidController {
 
     }
 
+    @GetMapping("/{auctionId}/bids")
+    public ResponseEntity<List<BidDto>> getAllBids(
+            @PathVariable int auctionId) {
+
+        List<BidDto> bids = bidService.getAllBidsByAuction(auctionId);
+        if (bids.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(bids);
+    }
+
 
 
 }
