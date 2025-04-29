@@ -34,17 +34,20 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     private final UsersRepository userRepository;
     private final BidRepository bidRepo;
     private final JdbcTemplate jdbc;
+    private final AuctionEndNotificationServiceImpl auctionEndNotificationService;
 
     @Autowired
     public AuctionItemsServiceImpl(AuctionItemsRepository auctionItemsRepository,
                                    AuctionItemsMapper auctionItemsMapper, UsersRepository userRepository,
-                                   BidRepository bidRepo,JdbcTemplate jdbc) {
+                                   BidRepository bidRepo, JdbcTemplate jdbc, AuctionEndNotificationServiceImpl auctionEndNotificationService) {
         this.auctionItemsRepository = auctionItemsRepository;
         this.auctionItemsMapper = auctionItemsMapper;
         this.userRepository = userRepository;
         this.bidRepo = bidRepo;
         this.jdbc = jdbc;
+        this.auctionEndNotificationService = auctionEndNotificationService;
     }
+
 
     @Override
     public List<AuctionItemDto> findAllAuctionItems() {
@@ -97,6 +100,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
         // Persist the auction item in the database
         AuctionItems savedItem = auctionItemsRepository.save(auctionItem);
+        auctionEndNotificationService.subscribe(savedItem.getauction_id());
         return auctionItemsMapper.toDto(savedItem);
     }
 
