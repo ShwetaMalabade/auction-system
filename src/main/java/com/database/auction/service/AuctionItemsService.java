@@ -24,5 +24,9 @@ public interface AuctionItemsService {
     List<AuctionItemDto> getsalesreport();
     /** Get all orders a buyer has won (only past auctions) */
     List<BuyerOrderDTO> findOrdersByBuyer(int buyerId);
+
+    List<AuctionItemDto> searchAuctions(String query);
+
     List<QuestionDTO> getUnansweredQuestions(int auctionId);
+
 }

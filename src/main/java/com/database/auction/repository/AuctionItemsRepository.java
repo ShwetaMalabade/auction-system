@@ -32,4 +32,11 @@ public interface AuctionItemsRepository extends JpaRepository<AuctionItems, Long
 
     /** Find closed auctions where the given buyer was recorded as winner */
     List<AuctionItems> findByWinningBuyerIdAndClosingTimeBefore(Integer buyerId, Date now);
+
+    // 1) text search on name or description
+    List<AuctionItems> findByItemNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            String itemName, String description);
+
+    // 2) exact match on current bid (optional)
+    List<AuctionItems> findByCurrentBid(Double currentBid);
 }
