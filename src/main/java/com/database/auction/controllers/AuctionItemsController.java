@@ -147,7 +147,7 @@ public class AuctionItemsController {
             img.setImageData(file.getBytes());
             imagesRepo.save(img);
         }
-        auctionEventScheduler.scheduleEndForAuction(saved);
+        //auctionEventScheduler.scheduleEndForAuction(saved);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
