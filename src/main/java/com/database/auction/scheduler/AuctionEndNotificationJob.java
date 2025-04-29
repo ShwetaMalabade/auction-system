@@ -1,84 +1,79 @@
-// src/main/java/com/database/auction/jobs/AuctionEndNotificationJob.java
-package com.database.auction.scheduler;
+package com.database.auction.scheduler;// src/main/java/com/database/auction/jobs/AuctionEndNotificationJob.java
 
+
+import com.database.auction.entity.AuctionEndSubscription;
 import com.database.auction.entity.AuctionItems;
 import com.database.auction.entity.Bid;
+import com.database.auction.repository.AuctionEndSubscriptionRepository;
 import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.repository.BidRepository;
 import com.database.auction.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
 public class AuctionEndNotificationJob implements Job {
+    public AuctionEndNotificationJob() {}
 
-    // Quartz will call the no-arg constructor
-    public AuctionEndNotificationJob() { }
-
-    @Autowired
-    private AuctionItemsRepository itemsRepo;
-
-    @Autowired
-    private BidRepository bidRepo;
-
-    @Autowired
-    private NotificationService notificationService;
-
-//    public AuctionEndNotificationJob(
-//            AuctionItemsRepository itemsRepo,
-//            BidRepository bidRepo,
-//            NotificationService notificationService) {
-//        this.itemsRepo          = itemsRepo;
-//        this.bidRepo            = bidRepo;
-//        this.notificationService = notificationService;
-//    }
+    @Autowired private AuctionEndSubscriptionRepository subRepo;
+    @Autowired private AuctionItemsRepository           itemsRepo;
+    @Autowired private BidRepository                    bidRepo;
+    @Autowired private NotificationService              notifications;
 
     @Override
     public void execute(JobExecutionContext context) {
         JobDataMap data = context.getMergedJobDataMap();
-        int auctionId = data.getInt("auctionId");
-        log.info("🏁 AuctionEndNotificationJob fired for auction {}", auctionId);
+        Long subId = data.getLong("subscriptionId");
+        log.info("▶️ AuctionEndNotificationJob firing for subscription {}", subId);
 
-        // 1) load the auction
-        AuctionItems item = itemsRepo
-            .findByAuctionIdNative(auctionId)
-            .orElseThrow(() -> new IllegalStateException(
-                "Auction not found: " + auctionId));
+        // 1) load subscription & mark triggered
+        AuctionEndSubscription sub = subRepo.findById(subId)
+                .orElseThrow(() -> new IllegalStateException("No subscription " + subId));
 
+        if (Boolean.TRUE.equals(sub.getTriggered())) {
+            log.info("  – already triggered, skipping");
+            return;
+        }
+
+        // 2) load auction
+        AuctionItems item = itemsRepo.findByAuctionIdNative(sub.getAuctionId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Auction not found: " + sub.getAuctionId()));
+
+        // 3) determine which notification
         Integer winnerId = item.getWinningBuyerId();
-        double  price    = Optional.ofNullable(item.getCurrentBid()).orElse(0.0);
-
         if (winnerId != null) {
-            // Case A: a winner exists
-            String msg = String.format(
-                "🎉 Congrats! You won auction %d for £%.2f",
-                 auctionId, price);
-            notificationService.alertOutbid(winnerId, auctionId, msg);
-            log.info("Sent winner notification to buyerId={}", winnerId);
+            // ─── Case 1: winner exists
+            double price = item.getCurrentBid() != null ? item.getCurrentBid() : 0.0;
+            String msg = String.format("🎉 You won auction %d for £%.2f",
+                    item.getauction_id(), price);
+            notifications.alertOutbid(winnerId, item.getauction_id(), msg);
+            log.info("  – notified winner buyerId={}", winnerId);
 
         } else {
-            // Case B: no winner → look at bids
+            // ─── no winner: check bids
             List<Bid> bids = bidRepo.findAllByAuctionItem_Id(item.getId());
             int sellerId = item.getseller_id();
-
             String msg;
             if (bids.isEmpty()) {
-                // B1: no bids at all
+                // ── Case 2: no bids at all
                 msg = "😞 No one bid on your auction.";
             } else {
-                // B2: bids placed but none cleared min_price
-                msg = "⚠️ Bids were placed but none crossed the minimum price.";
+                // ── Case 3: bids placed but none crossed min_price
+                msg = "⚠️ Bids were placed but none crossed your minimum price.";
             }
-            notificationService.alertOutbid(sellerId, auctionId, msg);
-            log.info("Sent seller notification to sellerId={} : {}", sellerId, msg);
+            notifications.alertOutbid(sellerId, item.getauction_id(), msg);
+            log.info("  – notified sellerId={} : {}", sellerId, msg);
         }
+
+        // 4) mark subscription done
+        sub.setTriggered(true);
+        subRepo.save(sub);
+        log.info("  – subscription {} marked triggered", subId);
     }
 }
