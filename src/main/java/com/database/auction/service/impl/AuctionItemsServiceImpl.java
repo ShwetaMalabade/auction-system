@@ -244,22 +244,22 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
     }
 
 
-    public List<AuctionItemDto> getSalesReportByAuctionId(Integer auctionId) {
+    public List<AuctionItemDto> getSalesReportByAuctionId(Integer auction_id) {
         System.out.println("In Service Implementation");
 
-        if (auctionId == null) {
+        if (auction_id == null) {
             throw new IllegalArgumentException("auctionId must be provided");
         }
 
         String sql = """
         SELECT *
           FROM auction_items
-         WHERE auction_id = ?
+         WHERE auction_id = ? and current_bit<>0
         """;
 
         List<AuctionItemDto> list = jdbc.query(
                 sql,
-                new Object[]{ auctionId },
+                new Object[]{ auction_id },
                 (rs, rowNum) -> {
                     AuctionItemDto p = new AuctionItemDto();
                     p.setItemName(      rs.getString("item_name"));
@@ -278,7 +278,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         );
 
         if (list.isEmpty()) {
-            throw new EntityNotFoundException("No items found for auctionId=" + auctionId);
+            throw new EntityNotFoundException("No items found for auctionId=" + auction_id);
         }
 
         return list;
