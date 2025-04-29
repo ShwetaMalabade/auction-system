@@ -48,6 +48,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         this.auctionEndNotificationService = auctionEndNotificationService;
     }
 
+
     @Override
     public List<AuctionItemDto> findAllAuctionItems() {
         List<AuctionItems> items = auctionItemsRepository.findAll();
