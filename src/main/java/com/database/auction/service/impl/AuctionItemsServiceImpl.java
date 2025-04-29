@@ -216,7 +216,6 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         SELECT *
           FROM auction_questions
          WHERE auction_id = ?
-           AND answer IS NOT NULL
     """;
 
         List<QuestionDTO> list = jdbc.query(
@@ -288,7 +287,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
         String sql = """
         SELECT *
-          FROM auction_items
+          FROM auction_items where current_bid<>0
         """;
 
         List<AuctionItemDto> list = jdbc.query(
@@ -429,6 +428,32 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
                 .collect(Collectors.toList());
     }
 
+    public List<QuestionDTO> getUnansweredQuestions(int auctionId) {
+        String sql = """
+        SELECT question_id,
+               auction_id,
+               question,
+               answer
+          FROM auction_questions
+         WHERE auction_id = ?
+           AND answer IS NULL
+        """;
+
+        List<QuestionDTO> list = jdbc.query(
+                sql,
+                new Object[]{ auctionId },
+                (rs, rowNum) -> {
+                    QuestionDTO q = new QuestionDTO();
+                    q.setQuestionId(rs.getInt("question_id"));
+                    q.setAuctionId( rs.getInt("auction_id"));
+                    q.setQuestion(  rs.getString("question"));
+                    // .getAnswer() will remain null
+                    return q;
+                }
+        );
+
+        return list;
+    }
 
     @Override
     public List<AuctionItemDto> searchAuctions(String query) {

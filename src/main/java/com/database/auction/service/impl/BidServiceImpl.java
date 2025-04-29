@@ -259,6 +259,34 @@ public List<BidDto> getBidsByAuction(int auctionId) {
                 .collect(Collectors.toList());
     }
 
+    public List<BidDto> getAllBidsByAuction(int auctionId) {
+        String sql = """
+            SELECT bid_id,
+                   auction_id,
+                   bidder_id,
+                   amount,
+                   placed_at
+              FROM bids
+             WHERE auction_id = ?
+             ORDER BY placed_at ASC
+            """;
+        return jdbc.query(
+                sql,
+                new Object[]{ auctionId },
+                (rs, rowNum) -> {
+                    BidDto b = new BidDto();
+                    b.setBidId(     rs.getLong("bid_id"));
+                    b.setAuctionId( rs.getInt("auction_id"));
+                    b.setBuyerId(  rs.getInt("buyer_id"));
+                    b.setBidAmount(    rs.getDouble("bid_amount"));
+                    b.setBidTime(  rs.getDate("bid_time"));
+                    b.setReservePrice( rs.getDouble("reserve_price"));
+                    return b;
+                }
+        );
+    }
+
+    /** Deletes a single bid by its ID and auction; throws if not found. */
     public String removebid(int bid_id,int auction_id) {
         System.out.println("In Service Implementation");
         // fetch the username for this userId

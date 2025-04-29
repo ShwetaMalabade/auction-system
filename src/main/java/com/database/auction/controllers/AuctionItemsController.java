@@ -325,12 +325,32 @@ public class AuctionItemsController {
         return ResponseEntity.ok(orders);
     }
 
+
     @GetMapping("/search")
     public ResponseEntity<List<AuctionItemDto>> search(
             @RequestParam("q") String query) {
         List<AuctionItemDto> results = auctionItemsService.searchAuctions(query);
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping(
+            value = "/questions/unanswered/{auction_id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<QuestionDTO>> getUnansweredQuestions(
+            @PathVariable("auction_id") int auctionId) {
+
+        List<QuestionDTO> questions =
+                auctionItemsService.getUnansweredQuestions(auctionId);
+
+        if (questions.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(questions);
+    }
+
+
+
 
 
 }

@@ -9,4 +9,5 @@ public interface BidService {
     List<BidDto> getBidsByAuction(int auctionId);
     List<BidDto> getBidsByBuyer(int buyerId);
     String removebid(int bid_id,int auction_id);
+    List<BidDto> getAllBidsByAuction(int auctionId);
 }
