@@ -349,6 +349,19 @@ public class AuctionItemsController {
         return ResponseEntity.ok(questions);
     }
 
+    @GetMapping("/bestbuyer/getsalesreport")
+    public ResponseEntity<List<Object>> getbestBuyer()
+    {
+        System.out.println("In Controller");
+
+        List list=auctionItemsService.getsalesreportforBestBuyer();
+
+
+        return ResponseEntity.ok(list);
+
+    }
+
+
 
 
 

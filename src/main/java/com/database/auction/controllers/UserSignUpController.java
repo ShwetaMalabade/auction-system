@@ -4,7 +4,9 @@ import com.database.auction.dto.LoginDTO;
 import com.database.auction.dto.PasswordDTO;
 import com.database.auction.dto.ProfileDTO;
 import com.database.auction.dto.UsersDTO;
+import com.database.auction.entity.Users;
 import com.database.auction.service.UsersService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -86,5 +90,34 @@ public class UserSignUpController {
 
 
 
+    @PostMapping("/nullify-password/{userId}")
+    public ResponseEntity<Void> pwd_Nullify(
+            @PathVariable int userId) {
+        System.out.println("In Controller – nullify password");
+        log.info("Nullifying password for userId=" + userId);
+
+        int rows = usersService.setPasswordToNull(userId);
+        // service returns number of rows updated
+
+        if (rows > 0) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+        }
+    }
+
+    @GetMapping("/null-passwords")
+    public ResponseEntity<List<UsersDTO>> getAllNullPasswords() {
+        List<UsersDTO> users = usersService.getAllNullPassword();
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(users);
+    }
 
 }
+
+
+
+
+

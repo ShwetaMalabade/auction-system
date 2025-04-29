@@ -28,5 +28,5 @@ public interface AuctionItemsService {
     List<AuctionItemDto> searchAuctions(String query);
 
     List<QuestionDTO> getUnansweredQuestions(int auctionId);
-
+    List getsalesreportforBestBuyer();
 }

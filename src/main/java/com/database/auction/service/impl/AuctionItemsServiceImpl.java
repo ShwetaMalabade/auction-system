@@ -488,6 +488,99 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
 
 
 
+    public List getsalesreportforBestBuyer() {
+        System.out.println("In Service Implementation");
+        // fetch the questions for this itemId
+
+        String sql = """
+                WITH BestBuyer AS (
+                  SELECT
+                    buyer_id
+                  FROM bids
+                  GROUP BY buyer_id
+                  ORDER BY COUNT(*) DESC
+                  LIMIT 1
+                )
+                SELECT ud.*
+                FROM user_details AS ud
+                JOIN BestBuyer   AS bb
+                  ON ud.id = bb.buyer_id;
+              """;
+
+        List<AuctionItemDto> auctionlist = jdbc.query(
+                sql,
+                new Object[]{ },
+                (rs, rowNum) -> {
+                    AuctionItemDto p = new AuctionItemDto();
+                    p.setItemName(      rs.getString("item_name"));
+                    p.setStartingPrice( rs.getDouble("starting_price"));
+                    p.setBidIncrement(  rs.getDouble("bid_increment"));
+                    p.setSellerId(      rs.getInt("seller_id"));
+                    String cat = rs.getString("category");
+                    p.setCategory(cat == null
+                            ? null
+                            : Category.valueOf(cat));
+                    p.setClosingTime(   rs.getDate("closing_time"));
+                    p.setDescription(   rs.getString("description"));
+                    p.setCurrentBid(    rs.getDouble("current_bid"));
+                    return p;
+                }
+        );
+
+        if (auctionlist.size()== 0) {
+
+            throw new EntityNotFoundException("buyer not found: ");
+        }
+
+
+        String sql2 = """
+                WITH BestBuyer AS (
+                  SELECT\s
+                    buyer_id
+                  FROM bids
+                  GROUP BY buyer_id
+                  ORDER BY COUNT(*) DESC
+                  LIMIT 1
+                )
+                -- Step B: pull all auction_items for that buyer
+                SELECT ai.*
+                FROM auction_items AS ai
+                JOIN bids AS b\s
+                  ON ai.auction_id = b.auction_id
+                JOIN BestBuyer AS bb\s
+                  ON b.buyer_id = bb.buyer_id;
+                    """;
+
+        ProfileDTO profiledto= jdbc.queryForObject(
+                sql2, new Object[]{ },
+                (rs, rowNum) -> {
+                    ProfileDTO p = new ProfileDTO();
+                    p.setUserId      (rs.getInt    ("userId"));
+                    p.setUsername    (rs.getString ("username"));
+                    p.setEmail       (rs.getString ("email"));
+                    p.setRole        (RoleType.valueOf(rs.getString("role")));
+                    p.setFirstName   (rs.getString ("firstName"));
+                    p.setLastName    (rs.getString ("lastName"));
+                    p.setAddress     (rs.getString ("address"));
+                    p.setPhoneNumber (rs.getString ("phoneNumber"));
+                    return p;
+                }
+        );
+
+        Users seller = userRepository.findByUserId(profiledto.getUserId());
+        if(!RoleType.BUYER.equals(seller.getRole())){
+            throw new IllegalArgumentException("Buyer id not found");
+
+        }
+
+        List<Object> list=new ArrayList<>();
+
+        list.add(profiledto);
+        list.add(auctionlist);
+
+
+        return list;
+    }
 
 
 
