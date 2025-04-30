@@ -11,10 +11,12 @@ import java.util.List;
 public class AuctionItems {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "auction_id", unique = true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "auction_id", updatable = false, nullable = false, unique = true)
     private int auction_id;
 
     @Column(name = "seller_id")
