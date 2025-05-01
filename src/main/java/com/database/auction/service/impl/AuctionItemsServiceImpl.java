@@ -254,7 +254,7 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
         String sql = """
         SELECT *
           FROM auction_items
-         WHERE auction_id = ? and current_bit<>0
+         WHERE auction_id = ? and current_bid<>0
         """;
 
         List<AuctionItemDto> list = jdbc.query(
@@ -301,11 +301,11 @@ public class AuctionItemsServiceImpl implements AuctionItemsService {
                     AuctionItemDto p = new AuctionItemDto();
                     p.setItemName(      rs.getString("item_name"));
                     p.setStartingPrice( rs.getDouble("starting_price"));
-                    p.setBidIncrement(  rs.getDouble("bid_increment"));
+                  p.setBidIncrement(  rs.getDouble("bid_increment"));
                     p.setSellerId(      rs.getInt("seller_id"));
-                    String cat = rs.getString("category");
-                    p.setCategory(cat == null
-                            ? null
+                   String cat = rs.getString("category");
+                   p.setCategory(cat == null
+                           ? null
                             : Category.valueOf(cat));
                     p.setClosingTime(   rs.getDate("closing_time"));
                     p.setDescription(   rs.getString("description"));
