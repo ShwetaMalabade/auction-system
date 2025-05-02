@@ -10,6 +10,7 @@ import com.database.auction.mapper.AuctionItemsMapper;
 import com.database.auction.repository.AuctionImageRepository;
 import com.database.auction.repository.AuctionItemsRepository;
 import com.database.auction.scheduler.AuctionEventScheduler;
+import com.database.auction.service.AuctionEndNotificationService;
 import com.database.auction.service.AuctionItemsService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
@@ -25,6 +26,7 @@ import java.io.IOException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -41,14 +43,16 @@ public class AuctionItemsController {
     private AuctionItemsMapper auctionItemsMapper;
     private AuctionImageRepository imagesRepo;
     private AuctionEventScheduler auctionEventScheduler;
+    private AuctionEndNotificationService auctionEndNotificationService;
 
 
     @Autowired
-    public AuctionItemsController(AuctionItemsService auctionItemsService,AuctionItemsRepository itemsRepo,
-                                  AuctionImageRepository imagesRepo) {
+    public AuctionItemsController(AuctionItemsService auctionItemsService, AuctionItemsRepository itemsRepo,
+                                  AuctionImageRepository imagesRepo, AuctionEndNotificationService auctionEndNotificationService) {
         this.auctionItemsService = auctionItemsService;
         this.auctionItemsRepository = itemsRepo;
         this.imagesRepo = imagesRepo;
+        this.auctionEndNotificationService = auctionEndNotificationService;
     }
 
     // Endpoint to retrieve all auction items
@@ -85,7 +89,7 @@ public class AuctionItemsController {
     @GetMapping("/{auctionId}")
     public ResponseEntity<AuctionItemDto> getAuctionItemByAuctionId(
             @PathVariable int auctionId) {
-
+log.info("In auction Item Controller");
         AuctionItemDto dto = auctionItemsService.findAuctionItemByAuctionId(auctionId);
         return ResponseEntity.ok(dto);
     }
@@ -105,15 +109,23 @@ public class AuctionItemsController {
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
           LocalDateTime closingTime,
           @RequestParam("start_time")
-          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-          LocalDateTime startTime,
+          //@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+          String startT,
           @RequestParam(value = "description", required = false) String description,
           @RequestParam("min_price")       Double minPrice,
           @RequestParam(value = "current_bid", required = false) Double currentBid,
           @RequestParam("images") MultipartFile[] images
     ) throws IOException, SchedulerException {
+        LocalDateTime startTime;
         log.info("inserting the items");
-        log.info("Uploaded time is "+startTime.toString());
+        if ("null".equals(startT )) {
+            startTime  = LocalDateTime.now();
+        } else{
+            startTime = LocalDateTime.parse(startT ,
+                    DateTimeFormatter.ISO_DATE_TIME);
+        }
+        //log.info("Uploaded time is "+startTime.toString());
+
         // Convert LocalDateTime to java.util.Date
         Date closing = Date.from(closingTime.atZone(ZoneId.systemDefault()).toInstant());
 
@@ -148,6 +160,7 @@ public class AuctionItemsController {
             imagesRepo.save(img);
         }
         //auctionEventScheduler.scheduleEndForAuction(saved);
+        auctionEndNotificationService.subscribe(Math.toIntExact(saved.getId()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -202,33 +215,57 @@ public class AuctionItemsController {
 
     }
 
-    @PutMapping(value="/insertquestion/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
+//    @PutMapping(value="/insertquestion/{auction_id}",consumes=MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Void> insertquestion(
+//
+//            @PathVariable int auction_id,
+//            @RequestBody QuestionDTO quesdto)
+//    {
+//        System.out.println("In Controller");
+//
+//        int affected= auctionItemsService.insertquestion(auction_id,quesdto.getQuestion());
+//
+//        if(affected>0)
+//            return ResponseEntity.status(HttpStatus.CREATED).build();
+//
+//        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
+//
+//    }
+
+    @PutMapping("/insertquestion/{auction_id}")
     public ResponseEntity<Void> insertquestion(
+            @PathVariable("auction_id") String auctionIdStr,
+            @RequestBody    QuestionDTO quesdto) {
 
-            @PathVariable int auction_id,
-            @RequestBody QuestionDTO quesdto)
-    {
-        System.out.println("In Controller");
+        int auctionId;
+        try {
+            auctionId = Integer.parseInt(auctionIdStr);
+        } catch (NumberFormatException ex) {
+            // return 400 Bad Request with a message
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .header("X-Error", "Invalid auction_id: " + auctionIdStr)
+                    .build();
+        }
 
-        int affected= auctionItemsService.insertquestion(auction_id,quesdto.getQuestion());
 
-        if(affected>0)
-            return ResponseEntity.status(HttpStatus.CREATED).build();
 
-        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-
+        int affected = auctionItemsService.insertquestion(auctionId, quesdto.getQuestion());
+        return affected > 0
+                ? ResponseEntity.status(HttpStatus.CREATED).build()
+                : ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
     }
 
     @GetMapping(
-            value = "/getallquessans/{auction_id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
+            value = "/getallquessans/{auctionId}"
+            //produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<QuestionDTO>> getallquessans(
-            @PathVariable("auction_id") int auction_id) {
+            @PathVariable("auctionId") int auctionId) {
         System.out.println("In Controller");
-        log.info("auction_id: {}", auction_id);
+        log.info("auction_id: {}", auctionId);
 
-        List<QuestionDTO> questions = auctionItemsService.getallquessans(auction_id);
+        List<QuestionDTO> questions = auctionItemsService.getallquessans(auctionId);
 
         if (questions.isEmpty()) {
             return ResponseEntity.noContent().build();

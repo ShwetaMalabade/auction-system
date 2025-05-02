@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,12 +37,13 @@ public class AuctionEndNotificationServiceImpl implements AuctionEndNotification
 
     @Override
     public AuctionEndSubscription subscribe(int auctionId) {
-        AuctionItems item = itemsRepo.findByAuctionIdNative(auctionId)
+        AuctionItems item = itemsRepo.findById((long) auctionId)
             .orElseThrow(() -> new AuctionItemNotFoundException(
                 "Auction not found: " + auctionId));
 
         AuctionEndSubscription sub = new AuctionEndSubscription();
         sub.setAuctionId(auctionId);
+        //Date closingtime = item.atZone(ZoneId.systemDefault()).toInstant();
         sub.setClosingTime(item.getClosingTime().toInstant());
         sub = subRepo.save(sub);
 

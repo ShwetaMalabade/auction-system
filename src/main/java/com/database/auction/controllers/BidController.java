@@ -1,7 +1,9 @@
+// src/main/java/com/database/auction/controllers/BidController.java
 package com.database.auction.controllers;
 
 import com.database.auction.dto.BidDto;
 import com.database.auction.service.BidService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/auth/bids")
+@Slf4j
 public class BidController {
 
     private final BidService bidService;
@@ -29,40 +32,33 @@ public class BidController {
 
     /** List all bids for a given auction */
     @GetMapping("/auction/{auctionId}")
-    public ResponseEntity<List<BidDto>> bidsByAuction(
-            @PathVariable int auctionId) {
+    public ResponseEntity<List<BidDto>> bidsByAuction(@PathVariable int auctionId) {
         return ResponseEntity.ok(bidService.getBidsByAuction(auctionId));
     }
 
     /** List all bids by a given buyer */
     @GetMapping("/buyer/{buyerId}")
-    public ResponseEntity<List<BidDto>> bidsByBuyer(
-            @PathVariable int buyerId) {
+    public ResponseEntity<List<BidDto>> bidsByBuyer(@PathVariable int buyerId) {
         return ResponseEntity.ok(bidService.getBidsByBuyer(buyerId));
     }
 
-    @PostMapping(value="/remove_bid/{bid_id}/{auction_id}")
-    public String removebid(
-            @PathVariable("bid_id") int bid_id,
-            @PathVariable("auction_id") int auction_id)
-    {
+    /** Remove a bid by its ID and auction ID */
+    @PostMapping("/remove_bid/{bid_id}/{auction_id}")
+    public String removeBid(
+            @PathVariable("bid_id") int bidId,
+            @PathVariable("auction_id") int auction_id) {
         System.out.println("In Controller");
-
-        return bidService.removebid(bid_id,auction_id);
-
+        log.info("auction_id"+auction_id );
+        return bidService.removeBid(bidId, auction_id);
     }
 
+    /** JDBC-based fetch of all bids for an auction (optional) */
     @GetMapping("/{auctionId}/bids")
-    public ResponseEntity<List<BidDto>> getAllBids(
-            @PathVariable int auctionId) {
-
+    public ResponseEntity<List<BidDto>> getAllBids(@PathVariable int auctionId) {
         List<BidDto> bids = bidService.getAllBidsByAuction(auctionId);
         if (bids.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(bids);
     }
-
-
-
 }
